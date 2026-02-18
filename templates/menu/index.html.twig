@@ -3,41 +3,37 @@
 {% block title %}Menu index{% endblock %}
 
 {% block body %}
-    <h1>Menu index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Titre</th>
-                <th>Description</th>
-                <th>NombrePersonneMin</th>
-                <th>PrixParPersonne</th>
-                <th>QuantiteRestante</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+<div class= "container py-5">
+
+    <h1 class="text-center mb-5">Notre carte gastronomique</h1>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+
         {% for menu in menus %}
-            <tr>
-                <td>{{ menu.id }}</td>
-                <td>{{ menu.titre }}</td>
-                <td>{{ menu.description }}</td>
-                <td>{{ menu.nombrePersonneMin }}</td>
-                <td>{{ menu.prixParPersonne }}</td>
-                <td>{{ menu.quantiteRestante }}</td>
-                <td>
-                    <a href="{{ path('app_menu_show', {'id': menu.id}) }}">show</a>
-                    <a href="{{ path('app_menu_edit', {'id': menu.id}) }}">edit</a>
-                </td>
-            </tr>
+
+        <div class="col">
+            <div class="card h-100 shadow-sm rounded-0 border-dark">
+                <img src="" class="card-img-top rounded-0" alt="Image du menu">
+                <div class="card-body">
+                     <h2 class="card-title text-center mb-3">{{ menu.titre }}</h2>
+                     <p class="card-text text-muted mb-3">{{ menu.description }}</p>
+                     <p class="fst-italic small text-muted mb-0">Nombre de personne minimum : {{ menu.nombrePersonneMin }}</p>
+                     <p class="text-end fw-bold">Prix : {{ menu.prixParPersonne }} €</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-end">
+                     <a href="{{ path('app_menu_show', {'id': menu.id}) }}" class="btn btn-dark">Voir le détail du menu</a>
+                </div>
+            </div>
+        </div>
+
         {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
+           
         {% endfor %}
-        </tbody>
-    </table>
+
+    </div>
+</div>
 
     <a href="{{ path('app_menu_new') }}">Create new</a>
+    
 {% endblock %}
