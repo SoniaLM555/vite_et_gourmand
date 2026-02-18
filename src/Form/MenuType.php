@@ -33,10 +33,20 @@ class MenuType extends AbstractType
                 'multiple' => true,
             ])
             
-            ->add('plats', EntityType::class, [
+            ->add('entree', EntityType::class, [
                 'class' => Plat::class,
-                'choice_label' => 'id',
-                'multiple' => true,
+                'choice_label' => 'nom', 
+                'placeholder' => 'Choisissez une entrée',
+            ])
+            ->add('platPrincipal', EntityType::class, [
+                'class' => Plat::class,
+                'choice_label' => 'nom',
+                'placeholder' => 'Choisissez un plat',
+            ])
+            ->add('dessert', EntityType::class, [
+                'class' => Plat::class,
+                'choice_label' => 'nom',
+                'placeholder' => 'Choisissez un dessert',
             ])
         ;
     }

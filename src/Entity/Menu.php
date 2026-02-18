@@ -56,6 +56,15 @@ class Menu
     #[ORM\ManyToMany(targetEntity: Plat::class, inversedBy: 'menus')]
     private Collection $plats;
 
+    #[ORM\ManyToOne]
+    private ?Plat $entree = null;
+
+    #[ORM\ManyToOne]
+    private ?Plat $platPrincipal = null;
+
+    #[ORM\ManyToOne]
+    private ?Plat $dessert = null;
+
     public function __construct()
     {
         $this->theme = new ArrayCollection();
@@ -230,4 +239,40 @@ class Menu
         return $this;
     }
     public function __toString(): string { return (string) $this->titre; }
+
+    public function getEntree(): ?Plat
+    {
+        return $this->entree;
+    }
+
+    public function setEntree(?Plat $entree): static
+    {
+        $this->entree = $entree;
+
+        return $this;
+    }
+
+    public function getPlatPrincipal(): ?Plat
+    {
+        return $this->platPrincipal;
+    }
+
+    public function setPlatPrincipal(?Plat $platPrincipal): static
+    {
+        $this->platPrincipal = $platPrincipal;
+
+        return $this;
+    }
+
+    public function getDessert(): ?Plat
+    {
+        return $this->dessert;
+    }
+
+    public function setDessert(?Plat $dessert): static
+    {
+        $this->dessert = $dessert;
+
+        return $this;
+    }
 }
