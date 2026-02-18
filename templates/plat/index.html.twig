@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Plat index{% endblock %}
+
+{% block body %}
+    <h1>Plat index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for plat in plats %}
+            <tr>
+                <td>{{ plat.id }}</td>
+                <td>{{ plat.nom }}</td>
+                <td>
+                    {% if plat.image %}
+                        <img src="{{ asset('uploads/' ~ plat.image) }}" alt="{{ plat.nom }}" style="width: 100px; height: auto; border-radius: 5px;">
+                    {% else %}
+                        <span>Pas d'image</span>
+                    {% endif %}
+                </td>
+                <td>{{ plat.description }}</td>
+                <td>
+                    <a href="{{ path('app_plat_show', {'id': plat.id}) }}">show</a>
+                    <a href="{{ path('app_plat_edit', {'id': plat.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_plat_new') }}">Create new</a>
+{% endblock %}

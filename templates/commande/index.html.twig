@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande index{% endblock %}
+
+{% block body %}
+    <h1>Commande index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>NumeroCommande</th>
+                <th>DateCommande</th>
+                <th>DatePrestation</th>
+                <th>HeureLivraison</th>
+                <th>PrixMenu</th>
+                <th>PrixLivraison</th>
+                <th>NombrePersonne</th>
+                <th>Statut</th>
+                <th>PretMateriel</th>
+                <th>RestitutionMateriel</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for commande in commandes %}
+            <tr>
+                <td>{{ commande.id }}</td>
+                <td>{{ commande.numeroCommande }}</td>
+                <td>{{ commande.dateCommande }}</td>
+                <td>{{ commande.datePrestation }}</td>
+                <td>{{ commande.heureLivraison }}</td>
+                <td>{{ commande.prixMenu }}</td>
+                <td>{{ commande.prixLivraison }}</td>
+                <td>{{ commande.nombrePersonne }}</td>
+                <td>{{ commande.statut }}</td>
+                <td>{{ commande.pretMateriel ? 'Yes' : 'No' }}</td>
+                <td>{{ commande.restitutionMateriel ? 'Yes' : 'No' }}</td>
+                <td>
+                    <a href="{{ path('app_commande_show', {'id': commande.id}) }}">show</a>
+                    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="12">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_commande_new') }}">Create new</a>
+{% endblock %}
