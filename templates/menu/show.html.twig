@@ -3,7 +3,7 @@
 {% block title %}Menu{% endblock %}
 
 {% block body %}
-    <h1>Menu</h1>
+    {#<h1>Menu</h1>
 
     <table class="table">
         <tbody>
@@ -38,5 +38,32 @@
 
     <a href="{{ path('app_menu_edit', {'id': menu.id}) }}">edit</a>
 
-    {{ include('menu/_delete_form.html.twig') }}
+    {{ include('menu/_delete_form.html.twig') }}#}
+
+    <div class="container py-5>
+        <a href="{{ path('app_menu_index') }}" class="btn btn-link text-dark mb-4"> Retour</a>
+        <div class="row g-5">
+            <div class="col-md-6">
+                <div class="border border-dark p-1">
+                <img src="[]>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold text-uppercase">{{ menu.titre }}</h1>
+                <p class="text-muted fs-5">{{ menu.description }}</p>
+                <div class="my-4">
+                    <span class="h1 fw-bold">{{ menu.prixParPersonne }} € / pers </span>
+                    <p class="text-danger fw-bold mt-2">Plus que {{ menu.quantiteRestante }} commande(s) disponible(s) .</p>
+                </div>
+            </div>
+
+            <button class="btn btn-dark btn-lg w-100 rounded-pill py-3 fw-bold text-uppercase mb-5">Commander</button>
+
+            <div class="border-top border-dark pt-4">
+                <h2 class="fw-bold text-uppercase mb-4">Contenu du Menu</h2>
+                <div class="my-4">
+                    <small class="text-mutted fw-bold">Entrée</small>
+                    <p class="text-danger fw-bold mt-2">Plus que {{ menu.quantiteRestante }} commande(s) disponible(s) .</p>
+                </div>
 {% endblock %}
