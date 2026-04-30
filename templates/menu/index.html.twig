@@ -4,57 +4,81 @@
 
 {% block body %}
 
-<div class="container py-5">
+<div class="py-5">
     <div class= "text-center mb-5">
         <h1 class="display-4 mb-3">La carte gastronomique</h1>
         <p class="lead text-muted mx-auto" style="max-width: 750px;">
             Explorez nos créations culinaires conçues pour sublimer vos réceptions. 
             Filtrez selon vos envies, vos thèmes et vos exigences alimentaires.
         </p>
-        <div class="mx-auto mt-3" style="width: 50px; height: 2px; background-color: #1A1A1A;">
-        </div>
     </div>
-    <div class="row mb-5 g-3">
-        <div class="col-md-3">
-            <select class="form-select rounded-0 border-dark shadow-none"><option selected>Thème</option></select>
-        </div>
-        <div class="col-md-3">
-            <select class="form-select rounded-0 border-dark shadow-none"><option selected>Régime</option></select>
-        </div>
-        <div class="col-md-3">
-            <input type="number" class="form-control rounded-0 border-dark shadow-none" placeholder="Nb de personnes">
-        </div>
-        <div class="col-md-3 d-flex align-items-center">
-            <input type="range" class="form-range me-2" min="0" max="200">
-            <span class="small text-nowrap">Prix max</span>
-        </div>
+    
+     
+    <div class="row mb-5 g-3 justify-content-center">
+    
+        <form method="get" action="{{ path('app_menu_index') }}" class="row g-3 justify-content-center align-items-end mb-5">
+            <div class="col-6 col-md-3 col-lg-2">
+                <select name="theme" class="form-select" onchange="this.form.submit()">
+                    <option value="">Thème</option>
+                    {% for theme in themes %}
+                        <option value="{{ theme.id }}" {{ app.request.query.get('theme') == theme.id ? 'selected' : '' }}>{{ theme.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <select name="regime" class="form-select" onchange="this.form.submit()">
+                    <option value="">Régime</option>
+                    {% for regime in regimes %}
+                        <option value="{{ regime.id }}" {{ app.request.query.get('regime') == regime.id ? 'selected' : '' }}>{{ regime.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <input type="number" name="nbPersonnes" class="form-control" placeholder="Nb personnes" value="{{ app.request.query.get('nbPersonnes') }}">
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <input type="number" name="prixMax" class="form-control" placeholder="Prix max €" value="{{ app.request.query.get('prixMax') }}">
+            </div>
+            <div class="col-12 col-lg-1">
+                <button type="submit" class="btn btn-dark w-100">Filtrer</button>
+            </div>
+        </form>
+          
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-        {% for menu in menus|slice(0, 4) %} 
-
-        <div class="col">
-            <div class="card h-100 shadow-sm rounded-0 border-dark">
-                <img src="https://placehold.co/600x400?text=Menu" class="card-img-top rounded-0" alt="Image">
-                <div class="card-body">
-                     <h2 class="card-title text-center mb-3 ">{{ menu.titre }}</h2>
-                     <p class="card-text text-muted mb-3">{{ menu.description }}</p>
-                     <p class="fst-italic small text-muted mb-0">Nombre de personne minimum : {{ menu.nombrePersonneMin }}</p>
-                     <p class="text-end fw-bold">Prix : {{ menu.prixParPersonne }} €</p>
-                </div>
-                <div class="card-footer bg-transparent border-0 text-end">
-                     <a href="{{ path('app_menu_show', {'id': menu.id}) }}" class="btn btn-dark">Voir le détail du menu</a>
+    <div class="row row-cols-2 g-4">
+        {% for menu in menus %} 
+            <div class="col">
+                <div class="card h-100 shadow-sm rounded-0 border-dark">
+                    <img src="https://placehold.co/600x400?text=Menu" class="card-img-top rounded-0" alt="Image">
+                    <div class="card-body">
+                         <h2 class="card-title text-center mb-3 ">{{ menu.titre }}</h2>
+                         <p class="card-text text-muted mb-3">{{ menu.description }}</p>
+                         <p class="fst-italic small text-muted mb-0">Nombre de personne minimum : {{ menu.nombrePersonneMin }}</p>
+                         <p class="text-end fw-bold">Prix : {{ menu.prixParPersonne }} €</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-end">
+                         <a href="{{ path('app_menu_show', {'id': menu.id}) }}" class="btn btn-dark">Voir le détail du menu</a>
+                    </div>
                 </div>
             </div>
-        </div>
-
         {% else %}
-           
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Aucun menu ne correspond à vos critères de recherche.</p>
+            </div>
         {% endfor %}
-
     </div>
+
+    <div class="d-flex justify-content-center mt-5">
+       {{ knp_pagination_render(menus) }} 
+    </div>
+
 </div>
 
-    <a href="{{ path('app_menu_new') }}">Create new</a>
+
     
+
 {% endblock %}
+
+
+    

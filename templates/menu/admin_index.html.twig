@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container py-5">
+    <h1>Gestion des menus</h1>
+    
+    <a href="{{ path('app_menu_new') }}" class="btn btn-dark mb-3">Ajouter un menu</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prix</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for menu in menus %}
+            <tr>
+                <td>{{ menu.titre }}</td>
+                <td>{{ menu.prixParPersonne }} €</td>
+                <td>
+                    <a href="{{ path('app_menu_edit', {'id': menu.id}) }}">Modifier</a>
+                    
+                    {# Formulaire de suppression simple #}
+                    <form method="post" action="{{ path('app_menu_delete', {'id': menu.id}) }}" style="display:inline-block;" onsubmit="return confirm('Supprimer ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ menu.id) }}">
+                        <button type="submit" class="btn btn-link text-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

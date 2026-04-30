@@ -98,7 +98,77 @@
                     color: #000;
                 }
 
-                            
+                
+                .btn-outline-secondary.input-filter {
+                    border: 1px solid #606060 !important;
+                    color: #606060 !important;
+                    background-color: transparent !important;
+                    border-radius: 6px !important;
+                    text-align: left; /* Aligne le texte à gauche comme un select */
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .btn-outline-secondary.input-filter:hover {
+                    background-color: #f8f9fa !important;
+                    color: #606060 !important;
+                }
+
+                .dropdown-menu {
+                    border: 1px solid #606060 !important;
+                    border-radius: 6px !important;
+                }
+                
+                
+                .pagination .page-item:first-child .page-link { font-size: 0; }
+                .pagination .page-item:first-child .page-link::before { content: "«"; font-size: 1rem; }
+
+                .pagination .page-item:last-child .page-link { font-size: 0; }
+                .pagination .page-item:last-child .page-link::after { content: "»"; font-size: 1rem; }  
+
+                
+                .pagination {
+                    margin-top: 2rem;
+                    gap: 8px; 
+                }
+
+                
+                .pagination .page-item .page-link {
+                    width: 45px; 
+                    height: 45px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 8px; /* Coins arrondis */
+                    border: 1px solid #dee2e6;
+                    color: #1A1A1A;
+                    font-family: var(--font-main);
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                }
+
+                
+                .pagination .page-item .page-link:hover {
+                    background-color: #1A1A1A;
+                    color: #FFFFFF;
+                    border-color: #1A1A1A;
+                }
+
+                
+                .pagination .page-item.active .page-link {
+                    background-color: #1A1A1A;
+                    border-color: #1A1A1A;
+                    color: #FFFFFF;
+                }
+
+                
+                .pagination .page-item.disabled .page-link {
+                    background-color: #f8f9fa;
+                    color: #ccc;
+                    border-color: #dee2e6;
+                }     
+
             </style>
 
         </head>
@@ -130,7 +200,7 @@
                 </div>
             </nav>
 
-            <main class="container py-4">
+            <main class="container-lg my-4">
             
                 {% block body %}{% endblock %}
             </main>

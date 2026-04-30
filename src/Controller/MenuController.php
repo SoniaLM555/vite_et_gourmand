@@ -10,15 +10,36 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\ThemeRepository; 
+use App\Repository\RegimeRepository; 
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted; // Pour le #[IsGranted]
+
 
 #[Route('/menu')]
 final class MenuController extends AbstractController
 {
+
     #[Route(name: 'app_menu_index', methods: ['GET'])]
-    public function index(MenuRepository $menuRepository): Response
+    public function index(Request $request, MenuRepository $menuRepository, ThemeRepository $themeRepository, RegimeRepository $regimeRepository, PaginatorInterface $paginator): Response 
     {
+        $themeId     = $request->query->get('theme');
+        $regimeId    = $request->query->get('regime');
+        $nbPersonnes = $request->query->get('nbPersonnes');
+        $prixMax     = $request->query->get('prixMax');
+
+        $themeId     = $themeId === '' ? null : (int)$themeId;
+        $regimeId    = $regimeId === '' ? null : (int)$regimeId;
+        $nbPersonnes = $nbPersonnes === '' ? null : (int)$nbPersonnes;
+        $prixMax     = $prixMax === '' ? null : (float)$prixMax;
+
+        $queryBuilder = $menuRepository->createQueryBuilderForFilters($themeId, $regimeId, $nbPersonnes, $prixMax);
+        $pagination   = $paginator->paginate($queryBuilder, $request->query->getInt('page', 1), 4);
+
         return $this->render('menu/index.html.twig', [
-            'menus' => $menuRepository->findAll(),
+            'menus'   => $pagination,
+            'themes'  => $themeRepository->findAll(),
+            'regimes' => $regimeRepository->findAll(),
         ]);
     }
 
@@ -77,5 +98,13 @@ final class MenuController extends AbstractController
         }
 
         return $this->redirectToRoute('app_menu_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/admin/liste', name: 'app_menu_admin_index', methods: ['GET'])]
+    public function adminIndex(MenuRepository $menuRepository): Response
+    {
+        return $this->render('menu/admin_index.html.twig', [
+            'menus' => $menuRepository->findAll(),
+        ]);
     }
 }
