@@ -1,77 +1,99 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Menu- {{ menu.titre }}{% endblock %}
+{% block title %}Menu - {{ menu.titre }}{% endblock %}
 
 {% block body %}
-    
 
-    <div class="container py-5">
-        <a href="{{ path('app_menu_index') }}" class="btn btn-link text-dark mb-4"> Retour</a>
+<div class="container py-5">
+    <a href="{{ path('app_menu_index') }}" class="btn btn-link text-dark mb-4 p-0">← Retour aux menus</a>
 
-        <div class="row g-5">
-            <div class="col-md-6">
-                <div class="border border-dark p-1">
-                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1000" class="img-fluid" alt="{{ menu.titre }}">
-                </div>
+    <div class="row g-5">
+        <div class="col-md-5">
+            <div class="border border-dark p-1">
+                <img src="{{ asset('images/' ~ (menu.imageName ?? 'default.jpg')) }}" class="img-fluid" alt="{{ menu.titre }}">
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <h1 class="display-3 fw-bold text-uppercase">{{ menu.titre }}</h1>
+            
+            <div class="d-flex align-items-center gap-3 my-4">
+                {% for theme in menu.theme %}
+                    <span class="badge bg-secondary px-3 py-2">{{ theme.nom }}</span>
+                {% endfor %}
+
+                <span class="h3 fw-bold mb-0">{{ menu.prixParPersonne }} € / personne</span>
             </div>
 
-            <div class="col-md-6">
-                <h1 class="display-4 fw-bold text-uppercase">{{ menu.titre }}</h1>
-                <p class="text-muted fs-5">{{ menu.description }}</p>
+            <p class="text-danger fw-bold fs-5">Plus que {{ menu.quantiteRestante }} commande(s) disponible(s).</p>
 
-                <div class="my-4">
-                    <span class="h1 fw-bold">{{ menu.prixParPersonne }} € / pers </span>
-                    <p class="text-danger fw-bold mt-2">Plus que {{ menu.quantiteRestante }} commande(s) disponible(s) .</p>
-                </div>
-            </div>
+            <a href="#" class="btn btn-lg w-100 py-3 fw-bold text-uppercase" 
+               style="background-color: #000000; color: #ffffff; border-radius: 6px; transition: background-color 0.3s ease;"
+               onmouseover="this.style.backgroundColor='#333333';" 
+               onmouseout="this.style.backgroundColor='#000000';">
+               Commander ce menu
+            </a>
 
-            <button class="btn btn-dark btn-lg w-100 rounded-pill py-3 fw-bold text-uppercase mb-5">Commander</button>
-
-            <div class="border-top border-dark pt-4">
-                <h2 class="fw-bold text-uppercase mb-4">Contenu du Menu</h2>
-                <div class="row">
-                    <div class="col-md-4">
-                        <small class="text-muted fw-bold text-uppercase">Entrée</small>
-                        {% if menu.entree %}
-                            <h3 class="fw-bold">{{ menu.entree.nom }}</h3>
-                            <p class="small text-muted">Allergènes :  {% for allergene in menu.entree.allergenes %}
-                                                                        {{ allergene.nom }}{% if not loop.last %}, {% endif %}
-                                                                      {% endfor %}</p>
-                        {% else %}
-                            <p class="text-muted italic">Aucune entrée sélectionnée</p>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4">
-                        <small class="text-muted fw-bold text-uppercase">Plat Principal</small>
-                        {% if menu.platPrincipal %}
-                            <h3 class="fw-bold">{{ menu.platPrincipal.nom }}</h3>
-                            <p class="small text-muted">Allergènes :  {% for allergene in menu.entree.allergenes %}
-                                                                        {{ allergene.nom }}{% if not loop.last %}, {% endif %}
-                                                                      {% endfor %}</p>
-                        {% else %}
-                            <p class="text-muted italic">Aucun plat sélectionné</p>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4">
-                        <small class="text-muted fw-bold text-uppercase">Dessert</small>
-                        {% if menu.dessert %}
-                            <h3 class="fw-bold">{{ menu.dessert.nom }}</h3>
-                            <p class="small text-muted">Allergènes :  {% for allergene in menu.entree.allergenes %}
-                                                                        {{ allergene.nom }}{% if not loop.last %}, {% endif %}
-                                                                      {% endfor %}</p>
-                        {% else %}
-                            <p class="text-muted italic">Aucun dessert sélectionné</p>
-                        {% endif %}
-                    </div>
-                </div>  
-                </div> 
-                <div class="mt-5">
-                    <a href="{{ path('app_menu_edit', {'id': menu.id}) }}" class="btn btn-outline-secondary btn-sm">Modifier le menu</a>
-                </div>
+            <div class="mt-4 p-3 bg-light border-start border-dark border-3">
+                <h5 class="fw-bold">Caractéristiques</h5>
+                <p class="mb-1">• Thème: {{ menu.theme.nom ?? 'Non défini' }}</p>
+                <p class="mb-1">• Régime: {{ menu.regime.nom ?? 'Non défini' }}</p>
             </div>
         </div>
     </div>
+
+    <div class="border-top border-dark pt-5 mt-5">
+        <h2 class="fw-bold text-uppercase mb-4">Contenu du Menu</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <small class="text-muted fw-bold text-uppercase">Entrée</small>
+                {% if menu.entree %}
+                    <h3 class="fw-bold">{{ menu.entree.nom }}</h3>
+                    <p class="small text-muted">Allergènes: 
+                        {% for a in menu.entree.allergenes %}
+                            {{ a.nom }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                {% else %}
+                    <p class="text-muted fst-italic">Aucune entrée</p>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4">
+                <small class="text-muted fw-bold text-uppercase">Plat Principal</small>
+                {% if menu.platPrincipal %}
+                    <h3 class="fw-bold">{{ menu.platPrincipal.nom }}</h3>
+                    <p class="small text-muted">Allergènes: 
+                        {# ICI ON CHANGE POUR platPrincipal #}
+                        {% for a in menu.platPrincipal.allergenes %}
+                            {{ a.nom }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                {% else %}
+                    <p class="text-muted fst-italic">Aucun plat</p>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4">
+                <small class="text-muted fw-bold text-uppercase">Dessert</small>
+                {% if menu.dessert %}
+                    <h3 class="fw-bold">{{ menu.dessert.nom }}</h3>
+                    <p class="small text-muted">Allergènes: 
+                        {# ICI ON CHANGE POUR dessert #}
+                        {% for a in menu.dessert.allergenes %}
+                            {{ a.nom }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                {% else %}
+                    <p class="text-muted fst-italic">Aucun dessert</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <a href="{{ path('app_menu_edit', {'id': menu.id}) }}" class="btn btn-outline-secondary btn-sm">Modifier le menu</a>
+    </div>
+</div>
 
 {% endblock %}

@@ -33,6 +33,12 @@ class Menu
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageName = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $delai = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stockage = null;
+
     /**
      * @var Collection<int, Theme>
      */
@@ -290,5 +296,27 @@ class Menu
 
         return $this;
     }
+
+    public function getDelai(): ?string
+        {
+            return $this->delai;
+        }
+
+        public function setDelai(?string $delai): static
+        {
+            $this->delai = $delai;
+            return $this;
+        }
+
+        public function getStockage(): ?string
+        {
+            return $this->stockage;
+        }
+
+        public function setStockage(?string $stockage): static
+        {
+            $this->stockage = $stockage;
+            return $this;
+        }
 
 }
