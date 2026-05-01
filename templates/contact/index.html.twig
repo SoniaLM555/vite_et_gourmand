@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact - Vite & Gourmand{% endblock %}
+
+{% block body %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <h1 class="mb-4 text-center">Contactez-nous</h1>
+
+            {# Affichage du message de succès après envoi #}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+
+            <div class="card p-4 shadow-sm border-0">
+                {{ form_start(contactForm) }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(contactForm.nom, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(contactForm.nom, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(contactForm.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(contactForm.email, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(contactForm.titre, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(contactForm.titre, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(contactForm.description, 'Objet demande', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(contactForm.description, {'attr': {'class': 'form-control', 'rows': '5'}}) }}
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100 mt-3">Envoyer la demande</button>
+                    
+                {{ form_end(contactForm) }}
+            </div>
+        </div>
+    </div>
+</div
+{% endblock %}
