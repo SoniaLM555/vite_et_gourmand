@@ -222,13 +222,21 @@
                                 href="{{ path('app_contact') }}">Contact</a>
                             </li>
                             <li class="nav-item ms-lg-3">
-                                <a class="nav-link" 
-                                href="#" 
-                                style="background-color: #000000; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px; transition: background-color 0.3s ease;"
-                                onmouseover="this.style.backgroundColor='#333333';" 
-                                onmouseout="this.style.backgroundColor='#000000';">
-                                Connexion
-                                </a>
+                                {% if app.user %}
+                                    {# Utilisateur connecté #}
+                                    <a class="nav-link" href="{{ path('app_logout') }}" 
+                                    style="background-color: #A00; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px;">
+                                    Déconnexion
+                                    </a>
+                                {% else %}
+                                    {# Visiteur non connecté #}
+                                    <a class="nav-link" href="{{ path('app_login') }}" 
+                                    style="background-color: #000000; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px; transition: background-color 0.3s ease;"
+                                    onmouseover="this.style.backgroundColor='#333333';" 
+                                    onmouseout="this.style.backgroundColor='#000000';">
+                                    Connexion
+                                    </a>
+                                {% endif %}
                             </li>
                         </ul>
                     </div>
