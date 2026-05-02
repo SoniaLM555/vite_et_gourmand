@@ -13,8 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\ThemeRepository; 
 use App\Repository\RegimeRepository; 
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted; // Pour le #[IsGranted]
-
+use Symfony\Component\Security\Http\Attribute\IsGranted; 
 
 #[Route('/menu')]
 final class MenuController extends AbstractController
@@ -43,6 +42,7 @@ final class MenuController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_menu_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -71,6 +71,7 @@ final class MenuController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/edit', name: 'app_menu_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Menu $menu, EntityManagerInterface $entityManager): Response
     {
@@ -89,6 +90,7 @@ final class MenuController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', name: 'app_menu_delete', methods: ['POST'])]
     public function delete(Request $request, Menu $menu, EntityManagerInterface $entityManager): Response
     {
@@ -100,6 +102,7 @@ final class MenuController extends AbstractController
         return $this->redirectToRoute('app_menu_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/admin/liste', name: 'app_menu_admin_index', methods: ['GET'])]
     public function adminIndex(MenuRepository $menuRepository): Response
     {
