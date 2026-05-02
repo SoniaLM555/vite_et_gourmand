@@ -20,6 +20,9 @@
                 :root {
                     --font-main: 'Montserrat', sans-serif;
                     --font-title: 'Playfair Display', serif;
+                    --color-light: #E5E5E5;
+                    --color-dark: #606060;  
+                    --color-text: #333333; 
                 }
 
                 body {
@@ -35,7 +38,28 @@
                     font-weight: 700;
                 }
 
-                
+                .bg-charte-light { 
+                    background-color: var(--color-light) !important; 
+                }
+
+                .text-charte-dark { 
+                    color: var(--color-text) !important; 
+                }
+
+                .border-charte-dark { 
+                    border-color: var(--color-dark) !important;
+                }
+
+                .btn-charte { 
+                    background-color: var(--color-dark); 
+                    color: #fff; border-radius: 6px;
+                }
+
+                .btn-charte:hover { 
+                    background-color: #4a4a4a; 
+                    color: #fff; 
+                }
+
                 .btn-dark-custom {
                     background-color: #1A1A1A;
                     color: #FEFEFE;
