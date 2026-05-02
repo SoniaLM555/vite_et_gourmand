@@ -14,7 +14,10 @@
             <h1 class="fw-bold  mb-4">{{ menu.titre }}</h1>
             <p class="h3 mb-3">{{ menu.prixParPersonne }} €/personne</p>
             <p class="text-danger fw-bold mb-4">Plus que {{ menu.quantiteRestante }} commande(s) disponible(s)</p>
-            <a href="#" class="btn btn-dark btn-lg px-4 py-2">Commander ce menu</a>
+            <form action="{{ path('app_commande_valider', {'id': menu.id}) }}" method="post">
+                <input type="hidden" name="_token" value="{{ csrf_token('valider' ~ menu.id) }}">
+                <button type="submit" class="btn btn-dark btn-lg px-4 py-2">Commander ce menu</button>
+            </form>
         </div>
     </div>
 

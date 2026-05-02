@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+
+<div class="container py-5 d-flex justify-content-center">
+    <div class="col-md-6 bg-charte-light p-5 rounded">
+            <form method="post">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                {% if app.user %}
+                    <div class="alert alert-info mb-4">Connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>,<a href="{{ path('app_logout') }}" class="alert-link">Se déconnecter</a>
+                    </div>
+                {% endif %}
+
+                <h1 class="h3 mb-3 font-weight-normal">Connexion</h1>
+                
+                <div class="mb-3">
+                    <label for="inputEmail" class="form-label">Email</label>
+                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" required autofocus>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="inputPassword" class="form-label">Mot de passe</label>
+                    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="_remember_me" id="remember_me" class="form-check-input">
+                    <label class="form-check-label" for="remember_me">Se souvenir de moi</label>
+                </div>
+
+                <button class="btn btn-dark w-100" type="submit">Se connecter</button>
+
+            </form>
+    </div>
+</div>
+
+{% endblock %}

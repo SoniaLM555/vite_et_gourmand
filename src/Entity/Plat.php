@@ -119,4 +119,23 @@ class Plat
         return $this->menus;
     }
     public function __toString(): string { return (string) $this->nom; }
+
+    public function addMenu(Menu $menu): static
+    {
+        if (!$this->menus->contains($menu)) {
+            $this->menus->add($menu);
+            $menu->addPlat($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenu(Menu $menu): static
+    {
+        if ($this->menus->removeElement($menu)) {
+            $menu->removePlat($this);
+        }
+
+        return $this;
+    }
 }

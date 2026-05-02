@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">Récapitulatif de votre commande</h2>
+    
+    <div class="card p-4 bg-charte-light">
+        <h4>Menu : {{ menu.titre }}</h4>
+        <p>Date souhaitée : {{ commande.datePrestation }}</p>
+        <p class="h4">Total : {{ commande.prixMenu }} €</p>
+        
+        <form action="{{ path('app_commande_valider', {'id': menu.id}) }}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('valider' ~ menu.id) }}">
+            
+            
+            <label>Date de la prestation :</label>
+            <input type="date" name="datePrestation" value="{{ commande.datePrestation }}" required>
+            
+            <button type="submit" class="btn btn-dark">Confirmer et payer</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

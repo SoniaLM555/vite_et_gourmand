@@ -40,6 +40,9 @@ class Commande
     private ?string $statut = null;
 
     #[ORM\Column]
+    private ?int $quantite = null;
+
+    #[ORM\Column]
     private ?bool $pretMateriel = null;
 
     #[ORM\Column]
@@ -221,4 +224,17 @@ class Commande
         return $this;
     }
     public function __toString(): string { return 'Commande n°' . $this->id; }
+
+    public function getQuantite(): ?int
+    {
+        return $this->quantite;
+    }
+
+    public function setQuantite(int $quantite): static
+    {
+        $this->quantite = $quantite;
+
+        return $this;
+    }
+
 }
