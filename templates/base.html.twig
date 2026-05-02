@@ -218,16 +218,24 @@
                                 href="{{ path('app_menu_index') }}">Menus</a>
                             </li>
 
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <li class="nav-item">
-                                    <a class="nav-link text-danger" href="{{ path('app_menu_admin_index') }}">Admin</a>
-                                </li>
-                            {% endif %}
-
                             <li class="nav-item">
                                 <a class="nav-link {% if app.request.attributes.get('_route') == 'app_contact' %}active fw-bold{% endif %}" 
                                 href="{{ path('app_contact') }}">Contact</a>
                             </li>
+
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-danger" href="#" role="button" data-bs-toggle="dropdown">
+                                        Administration
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{{ path('app_utilisateur_index') }}">Gestion Utilisateurs</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_theme_index') }}">Gestion Thèmes</a></li>
+                                    </ul>
+                                </li>
+                            {% endif %}
+
+                            
                             <li class="nav-item ms-lg-3">
                                 {% if app.user %}
                                     {# Utilisateur connecté #}
