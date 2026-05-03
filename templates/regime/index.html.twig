@@ -3,7 +3,10 @@
 {% block title %}Regime index{% endblock %}
 
 {% block body %}
-    <h1>Regime index</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gestion des régimes</h1>
+        <a href="{{ path('app_menu_admin_index') }}" class="btn btn-secondary">Retour au Dashboard</a>
+    </div>
 
     <table class="table">
         <thead>
