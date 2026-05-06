@@ -225,12 +225,31 @@
 
                             {% if is_granted('ROLE_ADMIN') %}
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-danger" href="#" role="button" data-bs-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle text-danger fw-bold" href="#" role="button" data-bs-toggle="dropdown">
                                         Administration
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="{{ path('app_utilisateur_index') }}">Gestion Utilisateurs</a></li>
-                                        <li><a class="dropdown-item" href="{{ path('app_theme_index') }}">Gestion Thèmes</a></li>
+                                        {# Section Carte #}
+                                        <li><h6 class="dropdown-header">Gestion Carte</h6></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_plat_index') }}">Plats</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_menu_admin_index') }}">Menus</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_allergene_index') }}">Allergènes</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_theme_index') }}">Thèmes</a></li>
+                                        
+                                        <li><hr class="dropdown-divider"></li>
+                                        
+                                        {# Section Client #}
+                                        <li><h6 class="dropdown-header">Espace Client</h6></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_utilisateur_index') }}">Utilisateurs</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_commande_index') }}">Commandes</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_avis_index') }}">Avis</a></li>
+                                        
+                                        <li><hr class="dropdown-divider"></li>
+                                        
+                                        {# Section Config #}
+                                        <li><h6 class="dropdown-header">Configuration</h6></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_horaire_index') }}">Horaires</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_role_index') }}">Rôles</a></li>
                                     </ul>
                                 </li>
                             {% endif %}
