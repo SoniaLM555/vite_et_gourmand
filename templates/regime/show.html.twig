@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Regime{% endblock %}
+{% block title %}Détails du régime{% endblock %}
 
 {% block body %}
-    <h1>Regime</h1>
+    <h1>Régime : {{ regime.nom }}</h1>
 
     <table class="table">
         <tbody>
@@ -12,15 +12,15 @@
                 <td>{{ regime.id }}</td>
             </tr>
             <tr>
-                <th>Nom</th>
+                <th>Nom du régime</th>
                 <td>{{ regime.nom }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_regime_index') }}">back to list</a>
+    <a href="{{ path('app_regime_index') }}">Retour à la liste</a>
 
-    <a href="{{ path('app_regime_edit', {'id': regime.id}) }}">edit</a>
+    <a href="{{ path('app_regime_edit', {'id': regime.id}) }}">Modifier</a>
 
     {{ include('regime/_delete_form.html.twig') }}
 {% endblock %}

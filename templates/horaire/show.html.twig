@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Horaire{% endblock %}
+{% block title %}Détails des horaires d'ouverture{% endblock %}
 
 {% block body %}
-    <h1>Horaire</h1>
+    <h1 class="mb-4">Horaire du {{ horaire.jour }}</h1>
 
     <table class="table">
         <tbody>
@@ -16,19 +16,19 @@
                 <td>{{ horaire.jour }}</td>
             </tr>
             <tr>
-                <th>HeureOuverture</th>
+                <th>Heure d'ouverture</th>
                 <td>{{ horaire.heureOuverture }}</td>
             </tr>
             <tr>
-                <th>HeureFermeture</th>
+                <th>Heure de fermeture</th>
                 <td>{{ horaire.heureFermeture }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_horaire_index') }}">back to list</a>
+    <a href="{{ path('app_horaire_index') }}">Retour à la liste</a>
 
-    <a href="{{ path('app_horaire_edit', {'id': horaire.id}) }}">edit</a>
+    <a href="{{ path('app_horaire_edit', {'id': horaire.id}) }}">Modifier</a>
 
     {{ include('horaire/_delete_form.html.twig') }}
 {% endblock %}

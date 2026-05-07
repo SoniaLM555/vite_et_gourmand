@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Commande{% endblock %}
+{% block title %}Détails de la commande{% endblock %}
 
 {% block body %}
-    <h1>Commande</h1>
+    <h1 class="mb-4">Récapitulatif Commande n°{{ commande.numeroCommande }}</h1>
 
     <table class="table">
         <tbody>
@@ -12,31 +12,31 @@
                 <td>{{ commande.id }}</td>
             </tr>
             <tr>
-                <th>NumeroCommande</th>
+                <th>Numéro de commande</th>
                 <td>{{ commande.numeroCommande }}</td>
             </tr>
             <tr>
-                <th>DateCommande</th>
+                <th>Date de la commande</th>
                 <td>{{ commande.dateCommande }}</td>
             </tr>
             <tr>
-                <th>DatePrestation</th>
+                <th>Date de la prestation</th>
                 <td>{{ commande.datePrestation }}</td>
             </tr>
             <tr>
-                <th>HeureLivraison</th>
+                <th>Heure de livraison</th>
                 <td>{{ commande.heureLivraison }}</td>
             </tr>
             <tr>
-                <th>PrixMenu</th>
+                <th>Prix menu</th>
                 <td>{{ commande.prixMenu }}</td>
             </tr>
             <tr>
-                <th>PrixLivraison</th>
+                <th>Frais de Livraison</th>
                 <td>{{ commande.prixLivraison }}</td>
             </tr>
             <tr>
-                <th>NombrePersonne</th>
+                <th>Nombre de personne</th>
                 <td>{{ commande.nombrePersonne }}</td>
             </tr>
             <tr>
@@ -44,19 +44,19 @@
                 <td>{{ commande.statut }}</td>
             </tr>
             <tr>
-                <th>PretMateriel</th>
-                <td>{{ commande.pretMateriel ? 'Yes' : 'No' }}</td>
+                <th>Prêt de matériel</th>
+                <td>{{ commande.pretMateriel ? 'Oui' : 'Non' }}</td>
             </tr>
             <tr>
-                <th>RestitutionMateriel</th>
-                <td>{{ commande.restitutionMateriel ? 'Yes' : 'No' }}</td>
+                <th>Restitution de matériel</th>
+                <td>{{ commande.restitutionMateriel ? 'Effectuée' : 'En attente' }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_commande_index') }}">back to list</a>
+    <a href="{{ path('app_commande_index') }}">Retour à la liste</a>
 
-    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">edit</a>
+    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">Modifier</a>
 
     {{ include('commande/_delete_form.html.twig') }}
 {% endblock %}

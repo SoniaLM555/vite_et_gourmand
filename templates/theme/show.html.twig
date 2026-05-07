@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Theme{% endblock %}
+{% block title %}Détails du thème{% endblock %}
 
 {% block body %}
-    <h1>Theme</h1>
+   <h1>Thème : {{ theme.nom }}</h1>
 
     <table class="table">
         <tbody>
@@ -12,15 +12,15 @@
                 <td>{{ theme.id }}</td>
             </tr>
             <tr>
-                <th>Nom</th>
+                <th>Nom du thème</th>
                 <td>{{ theme.nom }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_theme_index') }}">back to list</a>
+    <a href="{{ path('app_theme_index') }}">Retour à la liste</a>
 
-    <a href="{{ path('app_theme_edit', {'id': theme.id}) }}">edit</a>
+    <a href="{{ path('app_theme_edit', {'id': theme.id}) }}">Modifier</a>
 
     {{ include('theme/_delete_form.html.twig') }}
 {% endblock %}

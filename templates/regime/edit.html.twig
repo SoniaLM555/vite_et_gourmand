@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Regime{% endblock %}
+{% block title %}Modifier le régime{% endblock %}
 
 {% block body %}
-    <h1>Edit Regime</h1>
+    <h1>Modifier le régime : {{ regime.nom }}</h1>
 
-    {{ include('regime/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('regime/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_regime_index') }}">back to list</a>
+    <a href="{{ path('app_regime_index') }}">Retour à la liste</a>
 
     {{ include('regime/_delete_form.html.twig') }}
 {% endblock %}
