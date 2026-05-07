@@ -22,17 +22,17 @@
                 <td>{{ theme.id }}</td>
                 <td>{{ theme.nom }}</td>
                 <td>
-                    <a href="{{ path('app_theme_show', {'id': theme.id}) }}">show</a>
-                    <a href="{{ path('app_theme_edit', {'id': theme.id}) }}">edit</a>
+                    <a href="{{ path('app_theme_show', {'id': theme.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                    <a href="{{ path('app_theme_edit', {'id': theme.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">no records found</td>
+                <td colspan="3">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_theme_new') }}">Create new</a>
+    <a href="{{ path('app_theme_new') }}" class="btn btn-sm btn-secondary">Ajouter un thème</a>
 {% endblock %}

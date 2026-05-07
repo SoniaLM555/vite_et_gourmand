@@ -40,17 +40,17 @@
                 <td>{{ commande.pretMateriel ? 'Yes' : 'No' }}</td>
                 <td>{{ commande.restitutionMateriel ? 'Yes' : 'No' }}</td>
                 <td>
-                    <a href="{{ path('app_commande_show', {'id': commande.id}) }}">show</a>
-                    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">edit</a>
+                    <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="12">no records found</td>
+                <td colspan="12">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_commande_new') }}">Create new</a>
+    <a href="{{ path('app_commande_new') }}" class="btn btn-sm btn-secondary">Ajouter une commande</a>
 {% endblock %}

@@ -26,17 +26,17 @@
                 <td>{{ horaire.heureOuverture }}</td>
                 <td>{{ horaire.heureFermeture }}</td>
                 <td>
-                    <a href="{{ path('app_horaire_show', {'id': horaire.id}) }}">show</a>
-                    <a href="{{ path('app_horaire_edit', {'id': horaire.id}) }}">edit</a>
+                    <a href="{{ path('app_horaire_show', {'id': horaire.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                    <a href="{{ path('app_horaire_edit', {'id': horaire.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="5">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_horaire_new') }}">Create new</a>
+    <a href="{{ path('app_horaire_new') }}" class="btn btn-sm btn-secondary">Ajouter un horaire</a>
 {% endblock %}

@@ -28,17 +28,17 @@
                 <td>{{ avi.statut }}</td>
                 <td>{{ avi.datePublication ? avi.datePublication|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_avis_show', {'id': avi.id}) }}">show</a>
-                    <a href="{{ path('app_avis_edit', {'id': avi.id}) }}">edit</a>
+                    <a href="{{ path('app_avis_show', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                    <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">no records found</td>
+                <td colspan="6">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_avis_new') }}">Create new</a>
+    <a href="{{ path('app_avis_new') }}" class="btn btn-sm btn-secondary">Ajouter un avis</a>
 {% endblock %}

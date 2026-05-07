@@ -21,17 +21,17 @@
             <tr>
                 <td>{{ allergene.id }}</td>
                 <td>
-                    <a href="{{ path('app_allergene_show', {'id': allergene.id}) }}">show</a>
-                    <a href="{{ path('app_allergene_edit', {'id': allergene.id}) }}">edit</a>
+                    <a href="{{ path('app_allergene_show', {'id': allergene.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                    <a href="{{ path('app_allergene_edit', {'id': allergene.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="2">no records found</td>
+                <td colspan="2">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_allergene_new') }}">Create new</a>
+    <a href="{{ path('app_allergene_new') }}"class="btn btn-sm btn-secondary" >Ajouter un allergène</a>
 {% endblock %}

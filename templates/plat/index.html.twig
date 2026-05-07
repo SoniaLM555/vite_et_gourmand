@@ -32,17 +32,17 @@
                 </td>
                 <td>{{ plat.description }}</td>
                 <td>
-                    <a href="{{ path('app_plat_show', {'id': plat.id}) }}">show</a>
-                    <a href="{{ path('app_plat_edit', {'id': plat.id}) }}">edit</a>
+                    <a href="{{ path('app_plat_show', {'id': plat.id}) }} " class="btn btn-sm btn-outline-secondary">Voir</a>
+                    <a href="{{ path('app_plat_edit', {'id': plat.id}) }} " class="btn btn-sm btn-outline-secondary">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="5">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_plat_new') }}">Create new</a>
+    <a href="{{ path('app_plat_new') }}" class="btn btn-sm btn-secondary">Ajouter un plat</a>
 {% endblock %}

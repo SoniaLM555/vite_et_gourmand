@@ -19,17 +19,17 @@
                 <td>{{ role.id }}</td>
                 <td>{{ role.libelle }}</td>
                 <td>
-                    <a href="{{ path('app_role_show', {'id': role.id}) }}">show</a>
-                    <a href="{{ path('app_role_edit', {'id': role.id}) }}">edit</a>
+                    <a href="{{ path('app_role_show', {'id': role.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                    <a href="{{ path('app_role_edit', {'id': role.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">no records found</td>
+                <td colspan="3">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_role_new') }}">Create new</a>
+    <a href="{{ path('app_role_new') }}" class="btn btn-sm btn-secondary">Ajouter un rôle</a>
 {% endblock %}
