@@ -3,9 +3,18 @@
 {% block title %}Nouveau Thème{% endblock %}
 
 {% block body %}
-    <h1><h1>Ajouter un thème de menu</h1></h1>
 
-    {{ include('theme/_form.html.twig') }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Ajouter un thème de menu</h1>
+        <a href="{{ path('app_theme_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
 
-    <a href="{{ path('app_theme_index') }}">Retour à la liste</a>
+    <div class="card p-4 shadow-sm mb-4">
+        {{ include('theme/_form.html.twig') }}
+    </div>
+
+    <div class="d-flex justify-content-start mt-3">
+        <button type="submit" form="form-theme" class="btn btn-secondary">Enregistrer le thème</button>
+    </div>
+      
 {% endblock %}

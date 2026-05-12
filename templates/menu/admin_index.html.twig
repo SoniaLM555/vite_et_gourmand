@@ -25,8 +25,10 @@
                 <td>{{ menu.titre }}</td>
                 <td>{{ menu.prixParPersonne }} €</td>
                 <td>
-                    <a href="{{ path('app_menu_show', {'id': menu.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                    <a href="{{ path('app_menu_edit', {'id': menu.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_menu_show', {'id': menu.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                        <a href="{{ path('app_menu_edit', {'id': menu.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    </div>
                 </td>
             </tr>
         {% else %}

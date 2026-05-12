@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Allergene index{% endblock %}
+{% block title %}Allergène index{% endblock %}
 
 {% block body %}
-    
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Gestion des allergènes</h1>
         <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
@@ -13,25 +13,30 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>actions</th>
+                <th>Nom</th> 
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for allergene in allergenes %}
             <tr>
                 <td>{{ allergene.id }}</td>
+                <td>{{ allergene.nom }}</td>
                 <td>
-                    <a href="{{ path('app_allergene_show', {'id': allergene.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                    <a href="{{ path('app_allergene_edit', {'id': allergene.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_allergene_show', {'id': allergene.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                        <a href="{{ path('app_allergene_edit', {'id': allergene.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    </div>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="2">Aucun résultat trouvé</td>
+                <td colspan="3">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_allergene_new') }}"class="btn btn-sm btn-secondary" >Ajouter un allergène</a>
+    <a href="{{ path('app_allergene_new') }}" class="btn btn-sm btn-secondary">Ajouter un allergène</a>
+
 {% endblock %}

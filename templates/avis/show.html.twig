@@ -3,31 +3,44 @@
 {% block title %}Détails de l'avis{% endblock %}
 
 {% block body %}
-    <h1>Détails de l'avis</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Détails de l'avis n°{{ avi.id }}</h1>
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+    </div>
 
     <table class="table">
+
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Note</th>
+                <th>Statut</th>
+                <th>Date</th>
+                <th>Commentaire</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
         <tbody>
             <tr>
-                <th>Id</th><td>{{ avi.id }}</td>
-            </tr>
-            <tr>
-                <th>Commentaire</th><td>{{ avi.commentaire }}</td>
-            </tr>
-            <tr>
-                <th>Note</th><td>{{ avi.note }}</td>
-            </tr>
-            <tr>
-                <th>Statut</th><td>{{ avi.statut }}</td>
-            </tr>
-            <tr>
-                <th>Date de publication</th><td>{{ avi.datePublication ? avi.datePublication|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ avi.id }}</td>
+                <td><span class="badge bg-secondary">{{ avi.note }}/5</span></td>
+                <td>{{ avi.statut }}</td>
+                <td>{{ avi.datePublication ? avi.datePublication|date('d/m/Y H:i') : '' }}</td>
+                <td class="text-truncate" style="max-width: 250px;">{{ avi.commentaire }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        {{ include('avis/_delete_form.html.twig') }}
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_avis_index') }}">Retour à la liste</a>
+    <div class="mt-4">
+        <a href="{{ path('app_avis_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
 
-    <a href="{{ path('app_avis_edit', {'id': avi.id}) }}">Modifier</a>
-
-    {{ include('avis/_delete_form.html.twig') }}
 {% endblock %}

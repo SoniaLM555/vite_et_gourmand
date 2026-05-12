@@ -3,24 +3,37 @@
 {% block title %}Détails du rôle{% endblock %}
 
 {% block body %}
-    <h1 class="mb-4">Rôle : {{ role.libelle }}</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Détails du rôle : {{ role.libelle }}</h1>
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+    </div>
 
     <table class="table">
-        <tbody>
+        <thead>
             <tr>
                 <th>Id</th>
-                <td>{{ role.id }}</td>
-            </tr>
-            <tr>
                 <th>Libellé</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr>
+                <td>{{ role.id }}</td>
                 <td>{{ role.libelle }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_role_edit', {'id': role.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        {{ include('role/_delete_form.html.twig') }}
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_role_index') }}">Retour à la liste</a>
-
-    <a href="{{ path('app_role_edit', {'id': role.id}) }}">Modifier</a>
-
-    {{ include('role/_delete_form.html.twig') }}
+    <div class="mt-4">
+        <a href="{{ path('app_role_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+    
 {% endblock %}

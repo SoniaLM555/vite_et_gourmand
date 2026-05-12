@@ -1,34 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Détails des horaires d'ouverture{% endblock %}
+{% block title %}Détails de l'horaire{% endblock %}
 
 {% block body %}
-    <h1 class="mb-4">Horaire du {{ horaire.jour }}</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Détails de l'horaire : {{ horaire.jour }}</h1>
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+    </div>
 
     <table class="table">
-        <tbody>
+        <thead>
             <tr>
                 <th>Id</th>
-                <td>{{ horaire.id }}</td>
-            </tr>
-            <tr>
                 <th>Jour</th>
-                <td>{{ horaire.jour }}</td>
+                <th>Ouverture</th>
+                <th>Fermeture</th>
+                <th>Actions</th>
             </tr>
+        </thead>
+        
+        <tbody>
             <tr>
-                <th>Heure d'ouverture</th>
+                <td>{{ horaire.id }}</td>
+                <td><strong>{{ horaire.jour }}</strong></td>
                 <td>{{ horaire.heureOuverture }}</td>
-            </tr>
-            <tr>
-                <th>Heure de fermeture</th>
                 <td>{{ horaire.heureFermeture }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_horaire_edit', {'id': horaire.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        {{ include('horaire/_delete_form.html.twig') }}
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_horaire_index') }}">Retour à la liste</a>
-
-    <a href="{{ path('app_horaire_edit', {'id': horaire.id}) }}">Modifier</a>
-
-    {{ include('horaire/_delete_form.html.twig') }}
+    <div class="mt-4">
+        <a href="{{ path('app_horaire_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+    
 {% endblock %}

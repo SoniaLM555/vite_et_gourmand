@@ -1,4 +1,3 @@
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'id': 'form-menu'}}) }}
     {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Enregistrer le menu') }}</button>
 {{ form_end(form) }}

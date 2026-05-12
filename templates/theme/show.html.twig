@@ -3,24 +3,37 @@
 {% block title %}Détails du thème{% endblock %}
 
 {% block body %}
-   <h1>Thème : {{ theme.nom }}</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Détails du thème : {{ theme.nom }}</h1>
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+    </div>
 
     <table class="table">
-        <tbody>
+        <thead>
             <tr>
                 <th>Id</th>
-                <td>{{ theme.id }}</td>
-            </tr>
-            <tr>
                 <th>Nom du thème</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr>
+                <td>{{ theme.id }}</td>
                 <td>{{ theme.nom }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_theme_edit', {'id': theme.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        {{ include('theme/_delete_form.html.twig') }}
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_theme_index') }}">Retour à la liste</a>
-
-    <a href="{{ path('app_theme_edit', {'id': theme.id}) }}">Modifier</a>
-
-    {{ include('theme/_delete_form.html.twig') }}
+    <div class="mt-4">
+        <a href="{{ path('app_theme_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+    
 {% endblock %}

@@ -3,6 +3,7 @@
 {% block title %}Commande index{% endblock %}
 
 {% block body %}
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Gestion des commandes</h1>
         <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
@@ -12,17 +13,15 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>NumeroCommande</th>
-                <th>DateCommande</th>
-                <th>DatePrestation</th>
-                <th>HeureLivraison</th>
-                <th>PrixMenu</th>
-                <th>PrixLivraison</th>
-                <th>NombrePersonne</th>
+                <th>N° Commande</th>
+                <th>Prestation</th>
+                <th>Heure</th>
+                <th>Prix menu</th>
+                <th>Livraison</th>
+                <th>Pers.</th>
                 <th>Statut</th>
-                <th>PretMateriel</th>
-                <th>RestitutionMateriel</th>
-                <th>actions</th>
+                <th>Matériel</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -30,27 +29,34 @@
             <tr>
                 <td>{{ commande.id }}</td>
                 <td>{{ commande.numeroCommande }}</td>
-                <td>{{ commande.dateCommande }}</td>
                 <td>{{ commande.datePrestation }}</td>
                 <td>{{ commande.heureLivraison }}</td>
-                <td>{{ commande.prixMenu }}</td>
-                <td>{{ commande.prixLivraison }}</td>
+                <td>{{ commande.prixMenu }} €</td>
+                <td>{{ commande.prixLivraison }} €</td>
                 <td>{{ commande.nombrePersonne }}</td>
-                <td>{{ commande.statut }}</td>
-                <td>{{ commande.pretMateriel ? 'Yes' : 'No' }}</td>
-                <td>{{ commande.restitutionMateriel ? 'Yes' : 'No' }}</td>
+                <td><span class="badge bg-secondary">{{ commande.statut }}</span></td>
                 <td>
-                    <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    {% if commande.pretMateriel %}
+                        <span class="text-success">Oui</span>
+                    {% else %}
+                        <span class="text-muted">Non</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                        <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    </div>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="12">Aucun résultat trouvé</td>
+                <td colspan="10" class="text-center">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
     <a href="{{ path('app_commande_new') }}" class="btn btn-sm btn-secondary">Ajouter une commande</a>
+
 {% endblock %}

@@ -3,6 +3,7 @@
 {% block title %}Horaire index{% endblock %}
 
 {% block body %}
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Gestion des horaires</h1>
         <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
@@ -13,30 +14,33 @@
             <tr>
                 <th>Id</th>
                 <th>Jour</th>
-                <th>HeureOuverture</th>
-                <th>HeureFermeture</th>
-                <th>actions</th>
+                <th>Ouverture</th>
+                <th>Fermeture</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for horaire in horaires %}
             <tr>
                 <td>{{ horaire.id }}</td>
-                <td>{{ horaire.jour }}</td>
+                <td><strong>{{ horaire.jour }}</strong></td>
                 <td>{{ horaire.heureOuverture }}</td>
                 <td>{{ horaire.heureFermeture }}</td>
                 <td>
-                    <a href="{{ path('app_horaire_show', {'id': horaire.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                    <a href="{{ path('app_horaire_edit', {'id': horaire.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_horaire_show', {'id': horaire.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                        <a href="{{ path('app_horaire_edit', {'id': horaire.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    </div>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">Aucun résultat trouvé</td>
+                <td colspan="5" class="text-center">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
     <a href="{{ path('app_horaire_new') }}" class="btn btn-sm btn-secondary">Ajouter un horaire</a>
+
 {% endblock %}

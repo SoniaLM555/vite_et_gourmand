@@ -1,4 +1,3 @@
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'id': 'form-commande'}}) }}
     {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Enregistrer la commande') }}</button>
 {{ form_end(form) }}

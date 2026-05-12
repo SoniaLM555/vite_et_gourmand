@@ -3,54 +3,58 @@
 {% block title %}Utilisateur index{% endblock %}
 
 {% block body %}
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Gestion des utilisateurs</h1>
         <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
     </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Email</th>
-                <th>Roles</th>
-                <th>Password</th>
-                <th>Nom</th>
-                <th>Prenom</th>
-                <th>Telephone</th>
-                <th>Pays</th>
-                <th>Ville</th>
-                <th>Adresse_postale</th>
-                <th>IsVerified</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for utilisateur in utilisateurs %}
-            <tr>
-                <td>{{ utilisateur.id }}</td>
-                <td>{{ utilisateur.email }}</td>
-                <td>{{ utilisateur.roles ? utilisateur.roles|json_encode : '' }}</td>
-                <td>{{ utilisateur.password }}</td>
-                <td>{{ utilisateur.nom }}</td>
-                <td>{{ utilisateur.prenom }}</td>
-                <td>{{ utilisateur.telephone }}</td>
-                <td>{{ utilisateur.pays }}</td>
-                <td>{{ utilisateur.ville }}</td>
-                <td>{{ utilisateur.adressePostale }}</td>
-                <td>{{ utilisateur.isVerified ? 'Yes' : 'No' }}</td>
-                <td>
-                    <a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                    <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="12">Aucun résultat trouvé</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Email</th>
+                    <th>Nom et prénom</th>
+                    <th>Ville</th>
+                    <th>Rôles</th>
+                    <th>Vérifié</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for utilisateur in utilisateurs %}
+                <tr>
+                    <td>{{ utilisateur.id }}</td>
+                    <td>{{ utilisateur.email }}</td>
+                    <td>{{ utilisateur.nom|upper }} {{ utilisateur.prenom }}</td>
+                    <td>{{ utilisateur.ville }}</td>
+                    <td>
+                        {% for role in utilisateur.roles %}
+                            <span class="badge bg-secondary small">{{ role }}</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <span class="badge {{ utilisateur.isVerified ? 'bg-success' : 'bg-danger' }}">
+                            {{ utilisateur.isVerified ? 'Oui' : 'Non' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                            <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">Aucun résultat trouvé</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <a href="{{ path('app_utilisateur_new') }}" class="btn btn-sm btn-secondary">Ajouter un eutilisateur</a>
+    <a href="{{ path('app_utilisateur_new') }}" class="btn btn-sm btn-secondary">Ajouter un utilisateur</a>
+
 {% endblock %}

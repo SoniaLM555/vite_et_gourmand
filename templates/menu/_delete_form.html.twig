@@ -1,4 +1,4 @@
 <form method="post" action="{{ path('app_menu_delete', {'id': menu.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce menu ? Cette action supprimera également sa visibilité côté client.');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ menu.id) }}">
-    <button class="btn">Supprimer le menu</button>
+    <button class="btn btn-sm btn-outline-secondary">Supprimer le menu</button>
 </form>

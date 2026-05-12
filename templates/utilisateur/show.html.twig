@@ -1,62 +1,53 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Utilisateur{% endblock %}
+{% block title %}Détails de l'utilisateur{% endblock %}
 
 {% block body %}
-    <h1>Utilisateur</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Détails de l'utilisateur : {{ utilisateur.prenom }} {{ utilisateur.nom }}</h1>
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+    </div>
 
     <table class="table">
-        <tbody>
+        <thead>
             <tr>
                 <th>Id</th>
-                <td>{{ utilisateur.id }}</td>
-            </tr>
-            <tr>
                 <th>Email</th>
-                <td>{{ utilisateur.email }}</td>
-            </tr>
-            <tr>
-                <th>Roles</th>
-                <td>{{ utilisateur.roles ? utilisateur.roles|json_encode : '' }}</td>
-            </tr>
-            <tr>
-                <th>Password</th>
-                <td>{{ utilisateur.password }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ utilisateur.nom }}</td>
-            </tr>
-            <tr>
-                <th>Prenom</th>
-                <td>{{ utilisateur.prenom }}</td>
-            </tr>
-            <tr>
-                <th>Telephone</th>
-                <td>{{ utilisateur.telephone }}</td>
-            </tr>
-            <tr>
-                <th>Pays</th>
-                <td>{{ utilisateur.pays }}</td>
-            </tr>
-            <tr>
+                <th>Nom et prénom</th>
                 <th>Ville</th>
-                <td>{{ utilisateur.ville }}</td>
+                <th>Rôles</th>
+                <th>Vérifié</th>
+                <th>Actions</th>
             </tr>
+        </thead>
+        
+        <tbody>
             <tr>
-                <th>Adresse_postale</th>
-                <td>{{ utilisateur.adressePostale }}</td>
-            </tr>
-            <tr>
-                <th>IsVerified</th>
-                <td>{{ utilisateur.isVerified ? 'Yes' : 'No' }}</td>
+                <td>{{ utilisateur.id }}</td>
+                <td>{{ utilisateur.email }}</td>
+                <td>{{ utilisateur.nom|upper }} {{ utilisateur.prenom }}</td>
+                <td>{{ utilisateur.ville }} ({{ utilisateur.pays }})</td>
+                <td>
+                    {% for role in utilisateur.roles %}
+                        <span class="badge bg-secondary">{{ role }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    <span class="badge {{ utilisateur.isVerified ? 'bg-success' : 'bg-danger' }}">
+                        {{ utilisateur.isVerified ? 'Oui' : 'Non' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        {{ include('utilisateur/_delete_form.html.twig') }}
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_utilisateur_index') }}">back to list</a>
-
-    <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}">edit</a>
-
-    {{ include('utilisateur/_delete_form.html.twig') }}
+    <div class="mt-4">
+        <a href="{{ path('app_utilisateur_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
 {% endblock %}

@@ -3,6 +3,7 @@
 {% block title %}Avis index{% endblock %}
 
 {% block body %}
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Gestion des avis</h1>
         <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
@@ -12,33 +13,37 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Commentaire</th>
                 <th>Note</th>
                 <th>Statut</th>
-                <th>DatePublication</th>
-                <th>actions</th>
+                <th>Date</th>
+                <th>Commentaire</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for avi in avis %}
             <tr>
                 <td>{{ avi.id }}</td>
-                <td>{{ avi.commentaire }}</td>
-                <td>{{ avi.note }}</td>
+                <td><span class="badge bg-secondary">{{ avi.note }}/5</span></td>
                 <td>{{ avi.statut }}</td>
-                <td>{{ avi.datePublication ? avi.datePublication|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ avi.datePublication ? avi.datePublication|date('d/m/Y H:i') : '' }}</td>
+                {# On coupe le commentaire s'il est trop long pour ne pas casser le tableau #}
+                <td class="text-truncate" style="max-width: 200px;">{{ avi.commentaire }}</td>
                 <td>
-                    <a href="{{ path('app_avis_show', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                    <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_avis_show', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                        <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    </div>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">Aucun résultat trouvé</td>
+                <td colspan="6" class="text-center">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
     <a href="{{ path('app_avis_new') }}" class="btn btn-sm btn-secondary">Ajouter un avis</a>
+
 {% endblock %}

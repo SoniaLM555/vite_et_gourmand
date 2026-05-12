@@ -3,24 +3,37 @@
 {% block title %}Détails du régime{% endblock %}
 
 {% block body %}
-    <h1>Régime : {{ regime.nom }}</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Détails du régime : {{ regime.nom }}</h1>
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+    </div>
 
     <table class="table">
-        <tbody>
+        <thead>
             <tr>
                 <th>Id</th>
-                <td>{{ regime.id }}</td>
-            </tr>
-            <tr>
                 <th>Nom du régime</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr>
+                <td>{{ regime.id }}</td>
                 <td>{{ regime.nom }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_regime_edit', {'id': regime.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        {{ include('regime/_delete_form.html.twig') }}
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_regime_index') }}">Retour à la liste</a>
-
-    <a href="{{ path('app_regime_edit', {'id': regime.id}) }}">Modifier</a>
-
-    {{ include('regime/_delete_form.html.twig') }}
+    <div class="mt-4">
+        <a href="{{ path('app_regime_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+    
 {% endblock %}

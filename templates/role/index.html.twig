@@ -1,16 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Role index{% endblock %}
+{% block title %}Rôle index{% endblock %}
 
 {% block body %}
-    <h1>Role index</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gestion des rôles</h1>
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+    </div>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Libelle</th>
-                <th>actions</th>
+                <th>Libellé</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -19,17 +23,20 @@
                 <td>{{ role.id }}</td>
                 <td>{{ role.libelle }}</td>
                 <td>
-                    <a href="{{ path('app_role_show', {'id': role.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                    <a href="{{ path('app_role_edit', {'id': role.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_role_show', {'id': role.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                        <a href="{{ path('app_role_edit', {'id': role.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    </div>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">Aucun résultat trouvé</td>
+                <td colspan="3" class="text-center">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
     <a href="{{ path('app_role_new') }}" class="btn btn-sm btn-secondary">Ajouter un rôle</a>
+
 {% endblock %}

@@ -1,8 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Theme index{% endblock %}
+{% block title %}Thème index{% endblock %}
 
 {% block body %}
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Gestion des thèmes</h1>
         <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
@@ -13,7 +14,7 @@
             <tr>
                 <th>Id</th>
                 <th>Nom</th>
-                <th>actions</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -22,17 +23,20 @@
                 <td>{{ theme.id }}</td>
                 <td>{{ theme.nom }}</td>
                 <td>
-                    <a href="{{ path('app_theme_show', {'id': theme.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                    <a href="{{ path('app_theme_edit', {'id': theme.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_theme_show', {'id': theme.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                        <a href="{{ path('app_theme_edit', {'id': theme.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    </div>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">Aucun résultat trouvé</td>
+                <td colspan="3" class="text-center">Aucun résultat trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
     <a href="{{ path('app_theme_new') }}" class="btn btn-sm btn-secondary">Ajouter un thème</a>
+
 {% endblock %}

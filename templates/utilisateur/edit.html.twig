@@ -1,13 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Utilisateur{% endblock %}
+{% block title %}Modifier le compte utilisateur{% endblock %}
 
 {% block body %}
-    <h1>Edit Utilisateur</h1>
 
-    {{ include('utilisateur/_form.html.twig', {'button_label': 'Update'}) }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Modifier le compte utilisateur</h1>
+        <a href="{{ path('app_utilisateur_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
 
-    <a href="{{ path('app_utilisateur_index') }}">back to list</a>
+    <div class="card p-4 shadow-sm mb-4">
+        {{ include('utilisateur/_form.html.twig', {'button_label': 'Update'}) }}
+    </div>
 
-    {{ include('utilisateur/_delete_form.html.twig') }}
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <button type="submit" form="form-utilisateur" class="btn btn-secondary">Mettre à jour</button>
+        {{ include('utilisateur/_delete_form.html.twig') }}
+    </div>
+
 {% endblock %}

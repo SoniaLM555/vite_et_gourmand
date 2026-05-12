@@ -3,9 +3,10 @@
 {% block title %}Nouveau Plat{% endblock %}
 
 {% block body %}
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Ajouter un nouveau plat</h1>
-        <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+        <a href="{{ path('app_plat_index') }}" class="btn btn-secondary">Retour à la liste</a>
     </div>
 
     <div class="card p-4 shadow-sm mb-4">
@@ -14,5 +15,6 @@
 
     <div class="d-flex justify-content-start mt-3">
         <button type="submit" form="form-plat" class="btn btn-secondary">Enregistrer le plat</button>
-    </div>    
+    </div>  
+      
 {% endblock %}
