@@ -54,7 +54,7 @@ final class MenuController extends AbstractController
             $entityManager->persist($menu);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_menu_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_menu_admin_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('menu/new.html.twig', [
@@ -81,7 +81,7 @@ final class MenuController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_menu_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_menu_admin_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('menu/edit.html.twig', [
@@ -99,7 +99,7 @@ final class MenuController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_menu_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_menu_admin_index', [], Response::HTTP_SEE_OTHER);
     }
 
     #[IsGranted('ROLE_ADMIN')]
@@ -108,6 +108,15 @@ final class MenuController extends AbstractController
     {
         return $this->render('menu/admin_index.html.twig', [
             'menus' => $menuRepository->findAll(),
+        ]);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/admin/{id}', name: 'app_menu_admin_show', methods: ['GET'])]
+    public function adminShow(Menu $menu): Response
+    {
+        return $this->render('menu/admin_show.html.twig', [
+            'menu' => $menu,
         ]);
     }
 }
