@@ -258,19 +258,15 @@
                             
                             <li class="nav-item ms-lg-3">
                                 {% if app.user %}
-                                    {# Utilisateur connecté #}
-                                    <a class="nav-link" href="{{ path('app_logout') }}" 
-                                    style="background-color: #A00; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px;">
-                                    Déconnexion
-                                    </a>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="text-muted small">Bonjour {{ app.user.prenom }}</span>
+                                        <a class="nav-link" href="{{ path('app_logout') }}" style="background-color: #A00; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px;">Déconnexion</a>
+                                    </div>
                                 {% else %}
-                                    {# Visiteur non connecté #}
-                                    <a class="nav-link" href="{{ path('app_login') }}" 
-                                    style="background-color: #000000; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px; transition: background-color 0.3s ease;"
-                                    onmouseover="this.style.backgroundColor='#333333';" 
-                                    onmouseout="this.style.backgroundColor='#000000';">
-                                    Connexion
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <a class="nav-link" href="{{ path('app_login') }}" style="background-color: #000000; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px;">Connexion</a>
+                                        <a class="nav-link" href="{{ path('app_register') }}" style="background-color: #606060; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px;">Inscription</a>
+                                    </div>
                                 {% endif %}
                             </li>
                         </ul>
@@ -278,6 +274,16 @@
                 </div>
             </nav>
 
+            <div class="container mt-4">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
             <main class="container-lg my-4">
             
                 {% block body %}{% endblock %}
