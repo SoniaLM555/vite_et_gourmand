@@ -9,17 +9,17 @@
 
 <h3>Récapitulatif de votre prestation :</h3>
 <ul>
-    <li><strong>Menu sélectionné :</strong> {{ menu.titre }}</li>
+    <li>
+        <strong>Menu(s) sélectionné(s) :</strong>
+        <ul>
+            {% for m in commande.menus %}
+                <li>{{ m.titre }} ({{ m.prixParPersonne }} € / pers.)</li>
+            {% endfor %}
+        </ul>
+    </li>
     <li><strong>Date de livraison :</strong> {{ commande.datePrestation }}</li>
     <li><strong>Heure estimée :</strong> {{ commande.heureLivraison }}</li>
-    <li><strong>Nombre de convives :</strong> {{ commande.nombrePersonne }} personnes</li>
-</ul>
-
-<h3>Détail du prix :</h3>
-<ul>
-    <li><strong>Prix de la formule :</strong> {{ commande.prixMenu }} €</li>
-    <li><strong>Frais de logistique / livraison :</strong> {{ commande.prixLivraison }} €</li>
-    <li><strong>Statut actuel de la commande :</strong> <span style="color: #d97706; font-weight: bold;">{{ commande.statut }}</span></li>
+    <li><strong>Nombre total de convives :</strong> {{ commande.nombrePersonne }} personnes</li>
 </ul>
 
 {% if commande.pretMateriel %}

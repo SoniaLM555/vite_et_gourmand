@@ -1,23 +1,179 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Mon Panier - Vite & Gourmand{% endblock %}
+
 {% block body %}
-<div class="container py-5">
-    <h2 class="fw-bold mb-4">Récapitulatif de votre commande</h2>
+<div class="container py-4 text-charte-dark">
     
-    <div class="card p-4 bg-charte-light">
-        <h4>Menu : {{ menu.titre }}</h4>
-        <p>Date souhaitée : {{ commande.datePrestation }}</p>
-        <p class="h4">Total : {{ commande.prixMenu }} €</p>
-        
-        <form action="{{ path('app_commande_valider', {'id': menu.id}) }}" method="post">
-            <input type="hidden" name="_token" value="{{ csrf_token('valider' ~ menu.id) }}">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show mb-4" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {% if elements is empty %}
+        <div class="alert alert-info py-4 text-center">
+            Votre panier est actuellement vide. <a href="{{ path('app_menu_index') }}" class="fw-bold text-decoration-none">Parcourir les menus</a>
+        </div>
+    {% else %}
+        <div class="row">
             
+            <div class="col-md-6 mb-4">
+                <div class="card border-0 shadow-sm p-4 bg-white rounded h-100 d-flex flex-column">
+                    <h3 class="h5 mb-4 text-secondary border-bottom pb-2">1. Votre Panier & Tarification</h3>
+                    
+                    {% for item in elements %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                            <div class="flex-grow-1">
+                                <h4 class="h6 font-weight-bold text-dark mb-1">{{ item.menu.titre }}</h4>
+                                <small class="text-muted d-block mb-2">Tarif unitaire : {{ item.menu.prixParPersonne }} € / pers.</small>
+                                
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <form action="{{ path('app_panier_modifier_quantite', {'id': item.menu.id}) }}" method="post" class="d-inline">
+                                        <input type="hidden" name="action" value="decrement">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2 fw-bold">-</button>
+                                    </form>
+
+                                    <span class="badge bg-light text-dark border px-3 py-1 font-weight-bold">Pour {{ item.nbPersonnes }} pers.</span>
+
+                                    <form action="{{ path('app_panier_modifier_quantite', {'id': item.menu.id}) }}" method="post" class="d-inline">
+                                        <input type="hidden" name="action" value="increment">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2 fw-bold">+</button>
+                                    </form>
+                                </div>
+                                
+                                {% if item.aRemise %}
+                                    <div><span class="badge bg-success" style="font-size: 0.7rem;">Remise Groupe -10% appliquée</span></div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="text-end ms-3">
+                                <span class="d-block font-weight-bold text-dark h6 mb-1">{{ item.prixFinal|number_format(2, ',', ' ') }} €</span>
+                                {% if item.aRemise %}
+                                    <del class="text-muted small d-block mb-2">{{ item.prixBrut|number_format(2, ',', ' ') }} €</del>
+                                {% endif %}
+                                <a href="{{ path('app_panier_supprimer', {'id': item.menu.id}) }}" class="text-danger small text-decoration-none" onclick="return confirm('Retirer ce buffet du panier ?');">Supprimer</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    <div class="mb-4">
+                        <a href="{{ path('app_menu_index') }}" class="btn btn-outline-dark btn-sm">
+                            + Ajouter un autre buffet
+                        </a>
+                    </div>
+
+                    <div class="bg-light p-3 rounded border mb-3">
+                        <div class="d-flex justify-content-between small text-secondary mb-2">
+                            <span>Sous-total buffets :</span>
+                            <span class="fw-bold text-dark">{{ totalMenus|number_format(2, ',', ' ') }} €</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-secondary mb-2">
+                            <span>Frais de logistique réels :</span>
+                            <span class="fw-bold text-success">
+                                {% if app.session.get('livraison_calculee') is not null %}
+                                    {{ app.session.get('livraison_calculee')|number_format(2, ',', ' ') }} €
+                                {% else %}
+                                    <span class="text-muted small">Veuillez calculer à droite ➔</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong class="text-dark">Montant Total :</strong>
+                            <strong class="text-success h4 mb-0">
+                                {% if app.session.get('livraison_calculee') is not null %}
+                                    {{ (totalMenus + app.session.get('livraison_calculee'))|number_format(2, ',', ' ') }} €
+                                {% else %}
+                                    {{ totalMenus|number_format(2, ',', ' ') }} € <span class="text-muted small">(hors livraison)</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <form action="{{ path('app_panier_valider') }}" method="post" id="form-validation-finale" class="mt-auto">
+                        
+                        <div class="form-check p-2 bg-light rounded my-3">
+                            <input class="form-check-input ms-1 me-2" type="checkbox" id="pretMateriel" name="pretMateriel" value="1">
+                            <label class="form-check-label small text-dark fw-bold" for="pretMateriel">
+                                Demander le prêt de matériel gratuit (soumis à restitution sous 10 jours)
+                            </label>
+                        </div>
+
+                        {% if app.session.get('livraison_calculee') is not null %}
+                            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold shadow-sm">
+                                Confirmer la commande
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-secondary w-100 py-2 fw-bold shadow-sm" onclick="alert('Veuillez d\'abord cliquer sur le bouton vert \'Calculer les frais de livraison\' dans la colonne de droite.')" disabled>
+                                Veuillez calculer la livraison
+                            </button>
+                        {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card border-0 shadow-sm p-4 bg-white rounded h-100 d-flex flex-column">
+                    <h3 class="h5 mb-4 text-secondary border-bottom pb-2">2. Informations de livraison & Prestation</h3>
+                    
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted mb-0">Nom :</label>
+                            <input type="text" name="nomClient" form="form-validation-finale" class="form-control form-control-sm" value="{{ app.user.nom }}" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted mb-0">Prénom :</label>
+                            <input type="text" name="prenomClient" form="form-validation-finale" class="form-control form-control-sm" value="{{ app.user.prenom }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted mb-0">Adresse Email :</label>
+                        <input type="email" name="emailClient" form="form-validation-finale" class="form-control form-control-sm" value="{{ app.user.email }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted mb-0">GSM (Téléphone) :</label>
+                        <input type="text" name="telephoneClient" form="form-validation-finale" class="form-control form-control-sm" value="{{ app.user.telephone ?? '' }}" placeholder="Ex: 0612345678" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="adressePrestation" class="form-label small text-secondary fw-bold mb-0">Adresse exacte de la prestation :</label>
+                        <input type="text" id="adressePrestation" name="adressePrestation" form="form-validation-finale" class="form-control form-control-sm" value="{{ app.session.get('form_adresse') ?? app.user.adressePostale }}" required>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <label for="codePostalPrestation" class="form-label small text-secondary fw-bold mb-0">Code Postal :</label>
+                            <input type="text" id="codePostalPrestation" name="codePostalPrestation" form="form-validation-finale" class="form-control form-control-sm" value="{{ app.session.get('form_cp') ?? app.user.codePostal ?? '' }}" placeholder="Ex: 33000" maxlength="5" required>
+                        </div>
+                        <div class="col-8">
+                            <label for="villePrestation" class="form-label small text-secondary fw-bold mb-0">Ville de la prestation :</label>
+                            <input type="text" id="villePrestation" name="villePrestation" form="form-validation-finale" class="form-control form-control-sm" value="{{ app.session.get('form_ville') ?? app.user.ville }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label for="datePrestation" class="form-label small text-secondary fw-bold mb-0">Date souhaitée :</label>
+                            <input type="date" id="datePrestation" name="datePrestation" form="form-validation-finale" class="form-control form-control-sm" value="{{ app.session.get('form_date') ?? '' }}" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="heureLivraison" class="form-label small text-secondary fw-bold mb-0">Heure de livraison :</label>
+                            <input type="text" id="heureLivraison" name="heureLivraison" form="form-validation-finale" class="form-control form-control-sm" value="{{ app.session.get('form_heure') ?? '' }}" placeholder="Ex: 12h30" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" formaction="{{ path('app_panier_estimer_livraison') }}" form="form-validation-finale" class="btn btn-success w-100 py-2 fw-bold mt-auto shadow-sm">
+                        Calculer les frais de livraison
+                    </button>
+                </div>
+            </div>
             
-            <label>Date de la prestation :</label>
-            <input type="date" name="datePrestation" value="{{ commande.datePrestation }}" required>
-            
-            <button type="submit" class="btn btn-dark">Confirmer et payer</button>
-        </form>
-    </div>
+            </form>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

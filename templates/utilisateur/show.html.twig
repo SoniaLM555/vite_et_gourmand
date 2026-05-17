@@ -3,48 +3,156 @@
 {% block title %}Détails de l'utilisateur{% endblock %}
 
 {% block body %}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Détails de l'utilisateur : {{ utilisateur.prenom }} {{ utilisateur.nom }}</h1>
-        <a href="{{ path('app_utilisateur_index') }}" class="btn btn-secondary">Retour à la liste</a>
-    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Email</th>
-                <th>Nom et prénom</th>
-                <th>Ville</th>
-                <th>Rôles</th>
-                <th>Vérifié</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        
-        <tbody>
-            <tr>
-                <td>{{ utilisateur.id }}</td>
-                <td>{{ utilisateur.email }}</td>
-                <td>{{ utilisateur.nom|upper }} {{ utilisateur.prenom }}</td>
-                <td>{{ utilisateur.ville }} ({{ utilisateur.pays }})</td>
-                <td>
-                    {% for role in utilisateur.roles %}
-                        <span class="badge bg-secondary">{{ role }}</span>
-                    {% endfor %}
-                </td>
-                <td>
-                    <span class="badge {{ utilisateur.isVerified ? 'bg-success' : 'bg-danger' }}">
-                        {{ utilisateur.isVerified ? 'Oui' : 'Non' }}
-                    </span>
-                </td>
-                <td>
-                    <div class="d-flex gap-2">
-                        <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
-                        {{ include('utilisateur/_delete_form.html.twig') }}
+<div class="container py-4 text-charte-dark">
+
+    {% if is_granted('ROLE_ADMIN') and app.user != utilisateur %}
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Détails de l'utilisateur : {{ utilisateur.prenom }} {{ utilisateur.nom }}</h1>
+            <a href="{{ path('app_utilisateur_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Email</th>
+                    <th>Nom et prénom</th>
+                    <th>Adresse</th>
+                    <th>Ville</th>
+                    <th>Rôles</th>
+                    <th>Vérifié</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td>{{ utilisateur.id }}</td>
+                    <td>{{ utilisateur.email }}</td>
+                    <td>{{ utilisateur.nom|upper }} {{ utilisateur.prenom }}</td>
+                    <td>{{ utilisateur.adressePostale ?? 'Non renseignée' }}</td>
+                    <td><strong>{{ utilisateur.codePostal ?? 'N/C' }}</strong></td> 
+                    <td>{{ utilisateur.ville }} ({{ utilisateur.pays }})</td>
+                    <td>
+                        {% for role in utilisateur.roles %}
+                            <span class="badge bg-secondary">{{ role }}</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <span class="badge {{ utilisateur.isVerified ? 'bg-success' : 'bg-danger' }}">
+                            {{ utilisateur.isVerified ? 'Oui' : 'Non' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                            {{ include('utilisateur/_delete_form.html.twig') }}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    {% else %}
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Mon espace personnel</h1>
+            <a href="{{ path('app_menu_index') }}" class="btn btn-outline-dark">Retour aux menus</a>
+        </div>
+
+        <div class="card p-4 shadow-sm mb-5 bg-white border-0 rounded">
+            <h3 class="h5 mb-4 text-secondary border-bottom pb-2">Mes Informations Personnelles</h3>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <span class="text-muted d-block small">Nom et prénom</span>
+                    <strong>{{ utilisateur.nom|upper }} {{ utilisateur.prenom }}</strong>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <span class="text-muted d-block small">Adresse Email</span>
+                    <strong>{{ utilisateur.email }}</strong>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <span class="text-muted d-block small">Adresse complète de livraison</span>
+                    <strong>
+                        {{ utilisateur.adressePostale ?? 'Non renseignée' }}<br>
+                        {{ utilisateur.codePostal ?? '' }} {{ utilisateur.ville ?? '' }}
+                    </strong>
+                    <div class="mt-2">
+                        {% if utilisateur.ville|lower == 'bordeaux' %}
+                            <span class="badge bg-success ms-0 small">Zone Bordeaux (Livraison Gratuite)</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark ms-0 small">Zone Extérieure (Frais au km)</span>
+                        {% endif %}
                     </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                </div>
+                
+                <div class="col-md-6 mb-3 align-self-end">
+                    <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-sm btn-dark">
+                        Modifier mes coordonnées
+                    </a>
+                </div>
+            </div>
+        </div>
 
+        <div class="card p-4 shadow-sm bg-white border-0 rounded">
+            <h3 class="h5 mb-4 text-secondary border-bottom pb-2">Suivi de mes commandes</h3>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>N° Commande</th>
+                            <th>Date de livraison</th>
+                            <th>Heure</th>
+                            <th>Convives</th>
+                            <th>Montant Total</th>
+                            <th>Statut</th>
+                            <th>Prêt Matériel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for commande in utilisateur.commandes %}
+                        <tr>
+                            <td><strong class="text-dark">{{ commande.numeroCommande }}</strong></td>
+                            <td>{{ commande.datePrestation }}</td>
+                            <td>{{ commande.heureLivraison }}</td>
+                            <td>{{ commande.nombrePersonne }} pers.</td>
+                            <td><strong>{{ (commande.prixMenu + commande.prixLivraison)|number_format(2, ',', ' ') }} €</strong></td>
+                            <td>
+                                {% if commande.statut == 'En attente' %}
+                                    <span class="badge bg-warning text-dark">En attente</span>
+                                {% elseif commande.statut == 'Accepté' or commande.statut == 'En préparation' %}
+                                    <span class="badge bg-info text-dark">{{ commande.statut }}</span>
+                                {% elseif commande.statut == 'Livré' %}
+                                    <span class="badge bg-success">Livré</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ commande.statut }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if commande.pretMateriel %}
+                                    <span class="text-success fw-bold">Oui</span>
+                                    <small class="text-muted d-block" style="font-size:0.72rem;">
+                                        ({{ commande.restitutionMateriel ? 'Restitué ✅' : 'À restituer sous 10j ⚠️' }})
+                                    </small>
+                                {% else %}
+                                    <span class="text-muted">Non</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">Vous n'avez pas encore passé de commande.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>    
+    {% endif %}
+
+</div>
+    
 {% endblock %}

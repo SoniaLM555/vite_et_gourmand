@@ -14,10 +14,23 @@
             <h1 class="fw-bold  mb-4">{{ menu.titre }}</h1>
             <p class="h3 mb-3">{{ menu.prixParPersonne }} €/personne</p>
             <p class="text-danger fw-bold mb-4">Plus que {{ menu.quantiteRestante }} commande(s) disponible(s)</p>
-            <form action="{{ path('app_commande_valider', {'id': menu.id}) }}" method="post">
-                <input type="hidden" name="_token" value="{{ csrf_token('valider' ~ menu.id) }}">
-                <button type="submit" class="btn btn-dark btn-lg px-4 py-2">Commander ce menu</button>
-            </form>
+            {% if app.user %}
+                <form action="{{ path('app_panier_ajouter', {'id': menu.id}) }}" method="post" class="mt-4">
+                    <div class="form-group mb-3">
+                        <label for="quantite_personnes" class="form-label fw-bold text-dark">Nombre de personnes pour ce buffet :</label>
+                        <input type="number" id="quantite_personnes" name="quantite_personnes" class="form-control w-50" value="{{ menu.nombrePersonneMin }}" min="{{ menu.nombrePersonneMin }}" required>
+                        <small class="text-muted d-block mt-1">Seuil minimal requis pour cette formule : {{ menu.nombrePersonneMin }} personnes.</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark btn-lg px-4 py-2 mt-2">
+                        Ajouter ce menu au panier
+                    </button>
+                </form>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn btn-outline-secondary btn-lg px-4 py-2 text-decoration-none">
+                    Connectez-vous pour commander
+                </a>
+            {% endif %}
         </div>
     </div>
 
@@ -37,7 +50,7 @@
     </div>
 
     <div class="row pt-5">
-        {# Caractéristiques (1/3) - Titre gras, reste noir #}
+        
         <div class="col-md-4 mb-3">
             <div class="p-3 bg-charte-light  h-100">
                 <p class="fw-bold text-uppercase mb-3 text-center">Caractéristiques</p>
@@ -47,7 +60,7 @@
                                         {% endif %}</p>
             </div>
         </div>
-        {# Conditions importantes (2/3) - Titre gras, reste noir #}
+        
         <div class="col-md-8 mb-3 fw-bold">
             <div class="p-3 bg-charte-light h-100 ">
                 <p class="fw-bold text-uppercase mb-3 text-center">Conditions importantes</p>

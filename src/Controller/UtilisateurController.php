@@ -12,11 +12,22 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 
 #[Route('/utilisateur')]
 final class UtilisateurController extends AbstractController
 {
+    #[Route('/mon-profil', name: 'app_utilisateur_profil', methods: ['GET'])]
+        public function monProfil(): Response
+        {
+            
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+            
+            
+            return $this->render('utilisateur/show.html.twig', [
+                'utilisateur' => $this->getUser(),
+            ]);
+        }
+
     #[Route(name: 'app_utilisateur_index', methods: ['GET'])]
     public function index(UtilisateurRepository $utilisateurRepository): Response
     {
@@ -56,13 +67,20 @@ final class UtilisateurController extends AbstractController
     #[Route('/{id}/edit', name: 'app_utilisateur_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Utilisateur $utilisateur, EntityManagerInterface $entityManager): Response
     {
+
         $form = $this->createForm(UtilisateurType::class, $utilisateur);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_utilisateur_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Vos informations ont bien été mises à jour.');
+
+            if ($this->isGranted('ROLE_ADMIN') and $this->getUser() !== $utilisateur) {
+                return $this->redirectToRoute('app_utilisateur_index', [], Response::HTTP_SEE_OTHER);
+            }
+
+            return $this->redirectToRoute('app_utilisateur_profil');
         }
 
         return $this->render('utilisateur/edit.html.twig', [

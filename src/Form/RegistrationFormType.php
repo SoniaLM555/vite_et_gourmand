@@ -23,6 +23,7 @@ class RegistrationFormType extends AbstractType
             ->add('nom', TextType::class, ['label' => 'Nom'])
             ->add('prenom', TextType::class, ['label' => 'Prénom'])
             ->add('telephone', TextType::class, ['label' => 'Téléphone'])
+            ->add('codePostal', TextType::class, ['label' => 'Code Postal'])
             ->add('adressePostale', TextType::class, ['label' => 'Adresse postale'])
             ->add('ville', TextType::class, ['label' => 'Ville'])
             ->add('pays', TextType::class, ['label' => 'Pays'])

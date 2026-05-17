@@ -53,6 +53,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $adresse_postale = null;
 
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $code_postal = null;
+
     #[ORM\Column]
     private bool $isVerified = false;
 
@@ -301,4 +304,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
     public function __toString(): string { return $this->nom . ' ' . $this->prenom; }
-}
+
+    public function getCodePostal(): ?string
+        {
+            return $this->code_postal;
+        }
+
+        public function setCodePostal(?string $code_postal): static
+        {
+            $this->code_postal = $code_postal;
+
+            return $this;
+        }
+
+    }

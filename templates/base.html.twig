@@ -259,7 +259,17 @@
                             <li class="nav-item ms-lg-3">
                                 {% if app.user %}
                                     <div class="d-flex align-items-center gap-3">
-                                        <span class="text-muted small">Bonjour {{ app.user.prenom }}</span>
+                                        <a href="{{ path('app_utilisateur_profil') }}" class="text-dark fw-bold text-decoration-none small me-2">👤 {{ app.user.prenom }} {{ app.user.nom }}</a>
+                                        {% if app.user %}
+                                            <li class="nav-item">
+                                                <a class="nav-link fw-bold text-dark" href="{{ path('app_commande_panier') }}">
+                                                    🛒 Mon Panier 
+                                                    {% if app.session.get('panier')|length > 0 %}
+                                                        <span class="badge bg-danger">{{ app.session.get('panier')|length }}</span>
+                                                    {% endif %}
+                                                </a>
+                                            </li>
+                                        {% endif %}
                                         <a class="nav-link" href="{{ path('app_logout') }}" style="background-color: #A00; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px;">Déconnexion</a>
                                     </div>
                                 {% else %}
@@ -268,6 +278,7 @@
                                         <a class="nav-link" href="{{ path('app_register') }}" style="background-color: #606060; color: #ffffff; padding: 0.5rem 1rem; border-radius: 4px;">Inscription</a>
                                     </div>
                                 {% endif %}
+                                
                             </li>
                         </ul>
                     </div>
