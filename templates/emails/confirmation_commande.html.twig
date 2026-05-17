@@ -1,0 +1,37 @@
+<h1>Merci pour votre commande chez Vite & Gourmand !</h1>
+
+<p>Bonjour {{ user.prenom }} {{ user.nom }},</p>
+
+<p>
+    Nous avons le plaisir de vous confirmer l'enregistrement de votre commande 
+    <strong>{{ commande.numeroCommande }}</strong>.
+</p>
+
+<h3>Récapitulatif de votre prestation :</h3>
+<ul>
+    <li><strong>Menu sélectionné :</strong> {{ menu.titre }}</li>
+    <li><strong>Date de livraison :</strong> {{ commande.datePrestation }}</li>
+    <li><strong>Heure estimée :</strong> {{ commande.heureLivraison }}</li>
+    <li><strong>Nombre de convives :</strong> {{ commande.nombrePersonne }} personnes</li>
+</ul>
+
+<h3>Détail du prix :</h3>
+<ul>
+    <li><strong>Prix de la formule :</strong> {{ commande.prixMenu }} €</li>
+    <li><strong>Frais de logistique / livraison :</strong> {{ commande.prixLivraison }} €</li>
+    <li><strong>Statut actuel de la commande :</strong> <span style="color: #d97706; font-weight: bold;">{{ commande.statut }}</span></li>
+</ul>
+
+{% if commande.pretMateriel %}
+<p style="background-color: #fef3c7; padding: 10px; border-left: 4px solid #d97706; font-size: 14px;">
+    ⚠️ <strong>Rappel Prêt de Matériel :</strong> Vous avez choisi de bénéficier du prêt de matériel gratuit. 
+    Nous vous rappelons que celui-ci doit être restitué propre sous un délai de 10 jours après la prestation. 
+    En cas de non-restitution, un forfait de 600 € sera appliqué.
+</p>
+{% endif %}
+
+<p>
+    Julie, José et toute l'équipe se mettent dès à présent au travail pour régaler vos convives !<br>
+    À très vite,<br>
+    L'équipe Vite & Gourmand.
+</p>

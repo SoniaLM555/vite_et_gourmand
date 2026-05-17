@@ -9,12 +9,91 @@
         <a href="{{ path('app_commande_index') }}" class="btn btn-secondary">Retour à la liste</a>
     </div>
 
-    <div class="card p-4 shadow-sm mb-4">  
-        {{ include('commande/_form.html.twig') }}
-    </div>
+    {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show mb-4" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
 
-    <div class="d-flex justify-content-start mt-3">
-        <button type="submit" form="form-commande" class="btn btn-secondary">Enregistrer la commande</button>
-    </div>
 
+    <div class="row">
+                    <div class="col-md-5 mb-4">
+                <div class="card shadow-sm border-0 bg-white rounded">
+                    {% if menu.imageName %}
+                        <img src="{{ asset('uploads/images/' ~ menu.imageName) }}" class="card-img-top rounded-top" alt="{{ menu.titre }}">
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <span class="badge bg-success mb-2">Formule sélectionnée</span>
+                        <h2 class="h4 font-weight-bold text-dark mb-2">{{ menu.titre }}</h2>
+                        <p class="text-muted small mb-4">{{ menu.description }}</p>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-secondary">Prix de base :</span>
+                            <strong class="text-dark h5 mb-0">{{ menu.prixParPersonne }} € / convive</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-secondary">Seuil minimal requis :</span>
+                            <span class="badge bg-secondary">Minimum {{ menu.nombrePersonneMin }} personnes</span>
+                        </div>
+                        <div class="alert alert-info mt-3 mb-0 small border-0" role="alert">
+                             <strong>Offre Groupe :</strong> Obtenez <strong>-10% de réduction immédiate</strong> sur le buffet à partir de {{ menu.nombrePersonneMin + 5 }} convives !
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="col-md-7">
+                <div class="p-4 p-md-5 rounded shadow-sm bg-light">
+                    <h3 class="h4 mb-4 font-weight-normal text-dark">Informations de livraison</h3>
+                    
+                    {{ form_start(form) }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.nombrePersonne) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.quantite) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.datePrestation, { 'attr': {'placeholder': 'JJ/MM/AAAA'} }) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.heureLivraison, { 'attr': {'placeholder': 'Ex: 12h30 ou 19h15'} }) }}
+                            </div>
+                        </div>
+
+                        
+                        <div class="card bg-white p-3 border-0 rounded my-4 shadow-inner">
+                            <div class="form-check custom-checkbox">
+                                {{ form_widget(form.pretMateriel) }}
+                                {{ form_label(form.pretMateriel) }}
+                            </div>
+                            <p class="text-muted small mb-0 mt-2 pl-4">
+                                Le matériel (vaisselle, caissons isothermes) est mis à disposition gratuitement. Il doit être restitué propre sous 10 jours. En cas de non-restitution, un forfait de 600 € sera appliqué.
+                            </p>
+                        </div>
+
+                        
+                        <div class="alert alert-warning small border-0 mb-4">
+                            <strong>Logistique :</strong> Livraison gratuite dans Bordeaux intra-muros ! Hors Bordeaux, des frais fixes de 5 € majorés de 0,59 €/km s'appliqueront automatiquement lors du calcul final.
+                        </div>
+
+                        
+                        <button type="submit" class="btn btn-dark-custom w-100 py-2 mt-2" style="text-transform: none !important;">
+                            Confirmer et commander
+                        </button>
+                        
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+        </div>
+    </div>
 {% endblock %}

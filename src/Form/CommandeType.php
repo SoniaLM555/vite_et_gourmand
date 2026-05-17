@@ -9,32 +9,20 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class CommandeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('numeroCommande')
-            ->add('dateCommande')
-            ->add('datePrestation')
-            ->add('heureLivraison')
-            ->add('prixMenu')
-            ->add('prixLivraison')
-            ->add('nombrePersonne')
-            ->add('statut')
-            ->add('pretMateriel')
-            ->add('restitutionMateriel')
-            ->add('utilisateur', EntityType::class, [
-                'class' => Utilisateur::class,
-                'choice_label' => 'id',
-            ])
-            ->add('menus', EntityType::class, [
-                'class' => Menu::class,
-                'choice_label' => 'id',
-                'multiple' => true,
-            ])
-        ;
+            ->add('nombrePersonne', IntegerType::class, ['label' => 'Nombre de convives (personnes)','attr' => ['min' => 1]])
+            ->add('quantite', IntegerType::class, ['label' => 'Nombre de buffets/menus souhaités','data' => 1,'attr' => ['min' => 1]])
+            ->add('datePrestation', TextType::class, ['label' => 'Date de la prestation (JJ/MM/AAAA)'])
+            ->add('heureLivraison', TextType::class, ['label' => 'Heure souhaitée de livraison (Ex: 12h30)'])
+            ->add('pretMateriel', CheckboxType::class, ['label' => 'Souhaitez-vous le prêt de matériel (gratuit, soumis à restitution sous 10 jours) ?','required' => false]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
