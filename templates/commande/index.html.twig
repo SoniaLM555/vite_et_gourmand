@@ -6,7 +6,6 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Gestion des commandes</h1>
-        <a href="{{ path('app_commande_new') }}" class="btn btn-sm btn-secondary">Ajouter une commande</a>
     </div>
 
     <table class="table">
@@ -14,30 +13,47 @@
             <tr>
                 <th>Id</th>
                 <th>N° Commande</th>
+                <th>Client</th>
                 <th>Prestation</th>
                 <th>Heure</th>
                 <th>Prix menu</th>
                 <th>Livraison</th>
-                <th>Pers.</th>
+                <th>Total</th>
                 <th>Statut</th>
                 <th>Matériel</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
+
         {% for commande in commandes %}
             <tr>
                 <td>{{ commande.id }}</td>
                 <td>{{ commande.numeroCommande }}</td>
+                <td><strong>{{ commande.utilisateur.nom|upper }} {{ commande.utilisateur.prenom }}</strong></td>
                 <td>{{ commande.datePrestation }}</td>
                 <td>{{ commande.heureLivraison }}</td>
                 <td>{{ commande.prixMenu }} €</td>
-                <td>{{ commande.prixLivraison }} €</td>
-                <td>{{ commande.nombrePersonne }}</td>
-                <td><span class="badge bg-secondary">{{ commande.statut }}</span></td>
+                <td>
+                    {% if commande.prixLivraison == 0 %}
+                        <span class="text-success fw-bold">Gratuit (Bdx)</span>
+                    {% else %}
+                        {{ commande.prixLivraison }} €
+                    {% endif %}
+                </td>
+                <td><strong>{{ (commande.prixMenu + commande.prixLivraison) }} €</strong></td>
+                <td>
+                    {% if commande.statut == 'En attente' %}
+                        <span class="badge bg-warning text-dark">En attente</span>
+                    {% elseif commande.statut == 'Accepté' %}
+                        <span class="badge bg-success">Accepté</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ commande.statut }}</span>
+                    {% endif %}
+                </td>
                 <td>
                     {% if commande.pretMateriel %}
-                        <span class="text-success">Oui</span>
+                        <span class="text-success">Oui</span> ({{ commande.restitutionMateriel ? 'Rendu ✅' : 'À récupérer ⏳' }})
                     {% else %}
                         <span class="text-muted">Non</span>
                     {% endif %}
@@ -45,13 +61,13 @@
                 <td>
                     <div class="d-flex gap-2">
                         <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                        <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier/Statut</a>
                     </div>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="10" class="text-center">Aucun résultat trouvé</td>
+               <td colspan="11" class="text-center text-muted py-3">Aucune commande n'a encore été enregistrée.</td>
             </tr>
         {% endfor %}
         </tbody>
