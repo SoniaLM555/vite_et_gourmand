@@ -8,6 +8,26 @@
         <h1>Gestion des commandes</h1>
     </div>
 
+    <div class="card p-3 mb-4 bg-light border-0 shadow-sm">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <label for="search-client" class="form-label small fw-bold text-secondary mb-1">Rechercher un client :</label>
+                    <input type="text" id="search-client" class="form-control form-control-sm" placeholder="Saisissez un nom ou prénom...">
+                </div>
+
+                <div class="col-md-8">
+                    <label class="form-label small fw-bold text-secondary mb-1">Filtrer par statut :</label>
+                    <div class="d-flex gap-1 flex-wrap">
+                        <button class="btn btn-sm btn-dark btn-filter active" data-status="tous">Tous</button>
+                        <button class="btn btn-sm btn-outline-dark btn-filter" data-status="en attente">En attente</button>
+                        <button class="btn btn-sm btn-outline-dark btn-filter" data-status="accepté">Accepté</button>
+                        <button class="btn btn-sm btn-outline-dark btn-filter" data-status="en préparation">En préparation</button>
+                        <button class="btn btn-sm btn-outline-dark btn-filter" data-status="livré">Livré</button>
+                        <button class="btn btn-sm btn-outline-dark btn-filter" data-status="annulé">Annulé</button>
+                    </div>
+                </div>  
+            </div>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -27,7 +47,7 @@
         <tbody>
 
         {% for commande in commandes %}
-            <tr>
+            <tr class="commande-row" data-client="{{ commande.utilisateur.nom|lower }} {{ commande.utilisateur.prenom|lower }}" data-status="{{ commande.statut|lower }}">
                 <td>{{ commande.id }}</td>
                 <td>{{ commande.numeroCommande }}</td>
                 <td><strong>{{ commande.utilisateur.nom|upper }} {{ commande.utilisateur.prenom }}</strong></td>
@@ -72,5 +92,50 @@
         {% endfor %}
         </tbody>
     </table>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-client');
+    const filterButtons = document.querySelectorAll('.btn-filter');
+    const rows = document.querySelectorAll('.commande-row');
+    
+    let currentStatus = 'tous';
+
+    function filterTable() {
+        const searchText = searchInput.value.toLowerCase().trim();
+
+        rows.forEach(row => {
+            const clientName = row.getAttribute('data-client');
+            const rowStatus = row.getAttribute('data-status');
+                const matchesSearch = clientName.includes(searchText);
+                const matchesStatus = (currentStatus === 'tous' || rowStatus === currentStatus || (currentStatus === 'accepté' && rowStatus === 'accepté'));
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+    searchInput.addEventListener('input', filterTable);
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            filterButtons.forEach(b => {
+                b.classList.remove('active', 'btn-dark');
+                b.classList.add('btn-outline-dark');
+            });
+
+                this.classList.remove('btn-outline-dark');
+                this.classList.add('active', 'btn-dark');
+
+                currentStatus = this.getAttribute('data-status');
+                filterTable();
+            });
+        });
+    });
+</script>
+
 
 {% endblock %}
