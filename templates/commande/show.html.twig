@@ -19,7 +19,7 @@
                 <th>Prix total</th>
                 <th>Statut</th>
                 <th>Matériel</th>
-                <th>Actions</th>
+                <th>Action</th>
             </tr>
         </thead>
 
@@ -40,12 +40,22 @@
                 </td>
                 <td>
                     <div class="d-flex gap-2">
-                        <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
-                        {{ include('commande/_delete_form.html.twig') }}
+                        <a href="/commande/{{ commande.id }}/edit" class="btn btn-sm btn-outline-secondary">Modifier</a>
                     </div>
                 </td>
             </tr>
         </tbody>
     </table>
     
+    {% if commande.statut == 'Annulé' and commande.motifAnnulation is defined and commande.motifAnnulation is not empty %}
+        <div class="card bg-light border-danger mt-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-danger fw-bold d-flex align-items-center gap-2 mb-2">
+                    Motif d'annulation
+                </h5>
+                <p class="card-text text-dark mb-0"><strong>Motif saisi :</strong> {{ commande.motifAnnulation }}</p>
+            </div>
+        </div>
+    {% endif %}
+
 {% endblock %}

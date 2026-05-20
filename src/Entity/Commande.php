@@ -58,6 +58,10 @@ class Commande
     #[ORM\ManyToMany(targetEntity: Menu::class, inversedBy: 'commandes')]
     private Collection $menus;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $motifAnnulation = null;
+
+
     public function __construct()
     {
         $this->menus = new ArrayCollection();
@@ -236,5 +240,18 @@ class Commande
 
         return $this;
     }
+
+    public function getMotifAnnulation(): ?string
+    {
+        return $this->motifAnnulation;
+    }
+
+    public function setMotifAnnulation(?string $motifAnnulation): static
+    {
+        $this->motifAnnulation = $motifAnnulation;
+
+        return $this;
+    }
+
 
 }

@@ -20,7 +20,7 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 final class CommandeController extends AbstractController
 {
     #[IsGranted('ROLE_ADMIN')]
-    #[Route(name: 'app_commande_index', methods: ['GET'])]
+    #[Route('/', name: 'app_commande_index', methods: ['GET'])]
     public function index(CommandeRepository $commandeRepository): Response
     {
         return $this->render('commande/index.html.twig', [
@@ -90,7 +90,6 @@ final class CommandeController extends AbstractController
         return $this->redirectToRoute('app_commande_panier');
     }
 
-
     #[Route('/panier', name: 'app_commande_panier', methods: ['GET'])]
     public function afficherPanier(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -148,7 +147,6 @@ final class CommandeController extends AbstractController
         ]);
     }
 
-    
     #[Route('/panier/estimer-livraison', name: 'app_panier_estimer_livraison', methods: ['POST'])]
     public function estimerLivraison(Request $request): Response
     {
@@ -180,7 +178,6 @@ final class CommandeController extends AbstractController
         $qgLat = 44.837789;
         $qgLon = -0.57918;
 
-        // ÉTAPE A : Demander au traducteur d'adresse de l'État (BAN) les coordonnées GPS du lieu
         $adresseFormatee = urlencode($adresse . ' ' . $cp . ' ' . $ville);
         $urlApiAdresse = "https://api-adresse.data.gouv.fr/search/?q=" . $adresseFormatee . "&limit=1";
 
@@ -197,7 +194,6 @@ final class CommandeController extends AbstractController
             $clientLon = $dataAdresse['features'][0]['geometry']['coordinates'][0];
             $clientLat = $dataAdresse['features'][0]['geometry']['coordinates'][1];
 
-            // ÉTAPE B : Interroger l'API Géoplateforme Itinéraire officielle de l'IGN
             $urlIgn = "https://data.geopf.fr/navigation/itineraire";
             $payloadIgn = json_encode([
                 "start" => "{$qgLon},{$qgLat}",
@@ -348,19 +344,44 @@ final class CommandeController extends AbstractController
     #[Route('/{id}/edit', name: 'app_commande_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(CommandeType::class, $commande);
+        $form = $this->createForm(CommandeType::class, $commande, ['is_admin' => true]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            
+            if ($commande->getStatut() === 'Annulé') {
+                $confirmationContact = $form->get('confirmation_contact')->getData();
+                $motifAnnulation = trim((string)$form->get('motif_annulation')->getData());
 
-            return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
+                if (!$confirmationContact || empty($motifAnnulation)) {
+                    $this->addFlash('danger', 'Erreur : Conformément aux consignes, vous ne pouvez pas annuler une commande sans cocher la confirmation de contact ET saisir un motif précis.');
+                    
+                    return $this->render('commande/edit.html.twig', [
+                        'commande' => $commande,
+                        'form' => $form->createView(),
+                    ], new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
+                }
+
+                $commande->setMotifAnnulation($motifAnnulation);
+            }
+
+            $commandeData = $request->request->all('commande');
+            $restitution = isset($commandeData['restitutionMateriel']) ? (bool)$commandeData['restitutionMateriel'] : false;
+            $commande->setRestitutionMateriel($restitution);
+
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', 'Le statut de la commande a bien été mis à jour.');
+                return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'Erreur SQL / Système : ' . $e->getMessage());
+            }
         }
 
         return $this->render('commande/edit.html.twig', [
             'commande' => $commande,
             'form' => $form,
-        ]);
+        ], new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 
     #[Route('/{id}', name: 'app_commande_show', methods: ['GET'])]

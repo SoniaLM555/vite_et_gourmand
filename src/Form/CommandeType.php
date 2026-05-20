@@ -12,6 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class CommandeType extends AbstractType
 {
@@ -23,12 +24,26 @@ class CommandeType extends AbstractType
             ->add('datePrestation', TextType::class, ['label' => 'Date de la prestation (JJ/MM/AAAA)'])
             ->add('heureLivraison', TextType::class, ['label' => 'Heure souhaitée de livraison (Ex: 12h30)'])
             ->add('pretMateriel', CheckboxType::class, ['label' => 'Souhaitez-vous le prêt de matériel (gratuit, soumis à restitution sous 10 jours) ?','required' => false]);
+
+        if (isset($options['is_admin']) && $options['is_admin'] === true) {
+                    $builder
+                        ->add('statut', ChoiceType::class, ['label' => 'Statut', 'choices' => [
+                            'En attente de validation' => 'En attente',
+                            'Accepter la commande' => 'Accepté',
+                            'En cours de préparation' => 'En préparation',
+                            'Commande livrée' => 'Livré',
+                            'En attente retour matériel' => 'En attente matériel',
+                            'Annuler la commande' => 'Annulé'],
+                            'attr' => ['class' => 'form-select']])
+                        ->add('restitutionMateriel', CheckboxType::class, ['required' => false])
+                        ->add('confirmation_contact', CheckboxType::class, ['mapped' => false,'required' => false])
+                        ->add('motif_annulation', TextType::class, ['mapped' => false,'required' => false]);
+                    }
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => Commande::class,
-        ]);
+        $resolver->setDefaults(['data_class' => Commande::class,'is_admin' => false]);
     }
 }
