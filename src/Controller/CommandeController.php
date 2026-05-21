@@ -41,6 +41,12 @@ final class CommandeController extends AbstractController
             return $this->redirectToRoute('app_menu_show', ['id' => $menu->getId()]);
         }
 
+        $stockDisponible = $menu->getQuantiteRestante();
+                if ($nbPersonnesPourCeMenu > $stockDisponible) {
+                    $this->addFlash('danger', 'Désolé, il ne reste plus que ' . $stockDisponible . ' parts disponibles pour le menu "' . $menu->getTitre() . '". Vous ne pouvez pas commander pour ' . $nbPersonnesPourCeMenu . ' personnes.');
+                    return $this->redirectToRoute('app_menu_show', ['id' => $menu->getId()]);
+                }
+
         $session = $request->getSession();
         $panier = $session->get('panier', []);
 
@@ -297,7 +303,12 @@ final class CommandeController extends AbstractController
             $menu = $entityManager->getRepository(Menu::class)->find($menuId);
             if (!$menu) continue;
 
-            $menu->setQuantiteRestante($menu->getQuantiteRestante() - 1);
+        if ($menu->getQuantiteRestante() < $nbPersonnes) {
+                        $this->addFlash('danger', 'Erreur de stock : Entre-temps, le stock du menu "' . $menu->getTitre() . '" a diminué. Il ne reste que ' . $menu->getQuantiteRestante() . ' parts disponibles (Vous en demandiez ' . $nbPersonnes . '). Veuillez ajuster votre panier.');
+                        return $this->redirectToRoute('app_commande_panier');
+                    }
+
+            $menu->setQuantiteRestante($menu->getQuantiteRestante() - $nbPersonnes);
 
             $prixBrutMenu = $menu->getPrixParPersonne() * $nbPersonnes;
             if ($nbPersonnes >= ($menu->getNombrePersonneMin() + 5)) {
@@ -342,14 +353,17 @@ final class CommandeController extends AbstractController
 
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/edit', name: 'app_commande_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
     {
         $form = $this->createForm(CommandeType::class, $commande, ['is_admin' => true]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             
-            if ($commande->getStatut() === 'Annulé') {
+            $statutPrecedent = $entityManager->getUnitOfWork()->getOriginalEntityData($commande)['statut'] ?? null;
+            $nouveauStatut = $commande->getStatut();
+
+            if ($nouveauStatut === 'Annulé') {
                 $confirmationContact = $form->get('confirmation_contact')->getData();
                 $motifAnnulation = trim((string)$form->get('motif_annulation')->getData());
 
@@ -361,13 +375,64 @@ final class CommandeController extends AbstractController
                         'form' => $form->createView(),
                     ], new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
                 }
-
+                
                 $commande->setMotifAnnulation($motifAnnulation);
+
+                if ($statutPrecedent !== 'Annulé') {
+                    foreach ($commande->getMenus() as $menu) {
+                        $menu->setQuantiteRestante($menu->getQuantiteRestante() + 1);
+                    }
+                    $this->addFlash('info', 'Commande annulée : les menus ont été remis en stock (+1).');
+                }
+            }
+
+            if ($statutPrecedent === 'Annulé' && $nouveauStatut !== 'Annulé') {
+                foreach ($commande->getMenus() as $menu) {
+                    $menu->setQuantiteRestante($menu->getQuantiteRestante() - 1);
+                }
+                $commande->setMotifAnnulation(null);
+                $this->addFlash('warning', 'Commande réactivée : les menus ont été retirés du stock (-1).');
+            }
+
+            if ($statutPrecedent === 'Annulé' && $nouveauStatut !== 'Annulé') {
+                
+                foreach ($commande->getMenus() as $menu) {
+                    if ($menu->getQuantiteRestante() <= 0) {
+                        $this->addFlash('danger', 'Impossible de réactiver cette commande : le menu "' . $menu->getTitre() . '" est en rupture de stock (Quantité : 0).');
+                        
+                        return $this->render('commande/edit.html.twig', [
+                            'commande' => $commande,
+                            'form' => $form->createView(),
+                        ], new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
+                    }
+                }
+
+                foreach ($commande->getMenus() as $menu) {
+                    $menu->setQuantiteRestante($menu->getQuantiteRestante() - 1);
+                }
+                
+                $commande->setMotifAnnulation(null);
+                $this->addFlash('warning', 'Commande réactivée : les menus ont été retirés du stock (-1).');
             }
 
             $commandeData = $request->request->all('commande');
             $restitution = isset($commandeData['restitutionMateriel']) ? (bool)$commandeData['restitutionMateriel'] : false;
             $commande->setRestitutionMateriel($restitution);
+
+            if ($nouveauStatut === 'En attente matériel') {
+                $user = $commande->getUtilisateur();
+                if ($user && $user->getEmail()) {
+                    $email = (new TemplatedEmail())
+                        ->from(new Address('admin@test.com', 'Vite & Gourmand'))
+                        ->to((string)$user->getEmail())
+                        ->subject('Restitution obligatoire du matériel - Commande n°' . $commande->getNumeroCommande())
+                        ->htmlTemplate('emails/rappel_materiel.html.twig')
+                        ->context(['user' => $user, 'commande' => $commande]);
+                        
+                    $mailer->send($email);
+                    $this->addFlash('info', 'Le mail de rappel pour le matériel a été envoyé.');
+                }
+            }
 
             try {
                 $entityManager->flush();

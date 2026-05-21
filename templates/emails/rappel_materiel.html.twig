@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Restitution de votre matériel - Vite & Gourmand</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <h2 style="color: #d9534f; border-bottom: 2px solid #d9534f; padding-bottom: 12px; margin-top: 0;">
+            Restitution obligatoire du matériel prêté
+        </h2>
+        
+        <p>Bonjour {{ user.prenom }} {{ user.nom }},</p>
+        
+        <p>Le statut de votre commande <strong>n°{{ commande.numeroCommande }}</strong> vient d'être mis à jour : notre matériel est désormais inscrit <strong>"En attente de restitution"</strong>.</p>
+        
+        <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <p style="margin: 0; font-weight: bold; color: #856404;">Délai légal selon nos CGV :</p>
+            <p style="margin: 5px 0 0 0; color: #664d03;">
+                Conformément aux conditions générales de vente acceptées lors de votre commande, vous disposez d'un délai strict de <strong>10 jours ouvrés</strong> à compter de ce jour pour restituer l'intégralité du matériel mis à votre disposition.
+            </p>
+            <p style="margin: 12px 0 0 0; font-weight: bold; color: #842029; background-color: #f8d7da; padding: 8px; border-radius: 4px; border: 1px solid #f5c2c7;">
+                Passé ce délai de 10 jours, des frais forfaitaires d'un montant de 600 € vous seront automatiquement facturés.
+            </p>
+        </div>
+        
+        <p><strong>Comment restituer le matériel ?</strong><br>
+        Pour planifier le dépôt et convenir d'un rendez-vous dans nos locaux, vous devez impérativement <strong>prendre contact avec nous</strong> dans les plus brefs délais par retour de mail ou par téléphone.</p>
+        
+        <p style="margin-top: 30px; border-top: 1px solid #eeeeee; padding-top: 15px; font-size: 0.95em;">
+            Cordialement,<br>
+            <strong>L'équipe Vite & Gourmand</strong><br>
+        </p>
+    </div>
+</body>
+</html>
