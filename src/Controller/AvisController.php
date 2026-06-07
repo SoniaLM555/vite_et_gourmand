@@ -26,7 +26,14 @@ final class AvisController extends AbstractController
     #[Route('/new', name: 'app_avis_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $avi = new Avis();
+
+        $avi->setStatut('En attente');                     
+        $avi->setDatePublication(new \DateTimeImmutable()); 
+        $avi->setUtilisateur($this->getUser());            
+
         $form = $this->createForm(AvisType::class, $avi);
         $form->handleRequest($request);
 
@@ -34,7 +41,9 @@ final class AvisController extends AbstractController
             $entityManager->persist($avi);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_avis_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Votre avis a été enregistré avec succès et sera publié après validation par notre équipe.');
+
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('avis/new.html.twig', [
@@ -83,4 +92,27 @@ final class AvisController extends AbstractController
 
         return $this->redirectToRoute('app_avis_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/{id}/valider', name: 'app_avis_valider', methods: ['POST'])]
+    public function valider(Avis $avi, EntityManagerInterface $entityManager): Response
+    {
+        $avi->setStatut('Validé');
+        $entityManager->flush();
+
+        $this->addFlash('success', 'L\'avis a bien été validé et est maintenant affiché sur la page d\'accueil.');
+
+        return $this->redirectToRoute('app_avis_index');
+    }
+
+    #[Route('/{id}/refuser', name: 'app_avis_refuser', methods: ['POST'])]
+    public function refuser(Avis $avi, EntityManagerInterface $entityManager): Response
+    {
+        $entityManager->remove($avi);
+        $entityManager->flush();
+
+        $this->addFlash('warning', 'L\'avis a été refusé et supprimé de la base de données.');
+
+        return $this->redirectToRoute('app_avis_index');
+    }
+
 }

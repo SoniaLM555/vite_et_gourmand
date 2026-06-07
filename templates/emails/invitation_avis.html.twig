@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Votre avis nous intéresse ! - Vite & Gourmand</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-center: center;">
+        <h2 style="color: #2c3e50; border-bottom: 2px solid #f1c40f; padding-bottom: 12px; margin-top: 0; text-align: center;">
+            Votre avis nous intéresse !
+        </h2>
+        
+        <p>Bonjour <strong>{{ user.prenom }} {{ user.nom }}</strong>,</p>
+        
+        <p>Votre commande <strong>n°{{ commande.numeroCommande }}</strong> a bien été finalisée et livrée. Nous espérons que les buffets et créations de Julie et José ont ravi vos papilles ainsi que celles de vos convives !</p>
+        
+        <p>Parce que la satisfaction de nos clients est notre priorité absolue, nous aimerions beaucoup connaître votre retour d'expérience.</p>
+        
+        <div style="margin: 30px 0; text-align: center;">
+            <a href="{{ url('app_avis_new') }}" style="background-color: #2c3e50; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">
+                Laisser une note et un commentaire
+            </a>
+        </div>
+        
+        <p style="font-size: 0.9em; color: #777;">Si le bouton ci-dessus ne fonctionne pas, vous pouvez vous connecter à votre espace personnel pour soumettre votre avis.</p>
+        
+        <p style="margin-top: 30px; border-top: 1px solid #eeeeee; padding-top: 15px; font-size: 0.95em; text-align: left;">
+            Cordialement,<br>
+            <strong>L'équipe Vite & Gourmand</strong><br>
+            <span style="color: #777; font-size: 0.85em;">Service Relation Client</span>
+        </p>
+    </div>
+</body>
+</html>

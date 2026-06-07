@@ -24,21 +24,44 @@
         {% for avi in avis %}
             <tr>
                 <td>{{ avi.id }}</td>
-                <td><span class="badge bg-secondary">{{ avi.note }}/5</span></td>
-                <td>{{ avi.statut }}</td>
+                <td>
+                    {% if avi.note >= 4 %}
+                        <span class="badge bg-success">{{ avi.note }}/5</span>
+                    {% elseif avi.note == 3 %}
+                        <span class="badge bg-warning text-dark">{{ avi.note }}/5</span>
+                    {% else %}
+                        <span class="badge bg-danger">{{ avi.note }}/5</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if avi.statut == 'En attente' %}
+                        <span class="badge bg-warning text-dark">En attente</span>
+                    {% else %}
+                        <span class="badge bg-success">Validé</span>
+                    {% endif %}
+                </td>
                 <td>{{ avi.datePublication ? avi.datePublication|date('d/m/Y H:i') : '' }}</td>
-                {# On coupe le commentaire s'il est trop long pour ne pas casser le tableau #}
                 <td class="text-truncate" style="max-width: 200px;">{{ avi.commentaire }}</td>
                 <td>
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 align-items-center">
                         <a href="{{ path('app_avis_show', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
-                        <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        
+                        {% if avi.statut == 'En attente' %}
+                            <form method="post" action="{{ path('app_avis_valider', {'id': avi.id}) }}" style="display:inline;">
+                                <button class="btn btn-sm btn-success">Valider</button>
+                            </form>
+                            <form method="post" action="{{ path('app_avis_refuser', {'id': avi.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment refuser et supprimer cet avis ?');">
+                                <button class="btn btn-sm btn-danger">Refuser</button>
+                            </form>
+                        {% else %}
+                            <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        {% endif %}
                     </div>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6" class="text-center">Aucun résultat trouvé</td>
+                <td colspan="6" class="text-center">Aucun avis enregistré</td>
             </tr>
         {% endfor %}
         </tbody>

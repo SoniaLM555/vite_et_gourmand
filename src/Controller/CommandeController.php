@@ -362,6 +362,7 @@ final class CommandeController extends AbstractController
             
             $statutPrecedent = $entityManager->getUnitOfWork()->getOriginalEntityData($commande)['statut'] ?? null;
             $nouveauStatut = $commande->getStatut();
+            $nbPersonnesCommande = $commande->getNombrePersonne(); 
 
             if ($nouveauStatut === 'Annulé') {
                 $confirmationContact = $form->get('confirmation_contact')->getData();
@@ -380,25 +381,17 @@ final class CommandeController extends AbstractController
 
                 if ($statutPrecedent !== 'Annulé') {
                     foreach ($commande->getMenus() as $menu) {
-                        $menu->setQuantiteRestante($menu->getQuantiteRestante() + 1);
+                        $menu->setQuantiteRestante($menu->getQuantiteRestante() + $nbPersonnesCommande);
                     }
-                    $this->addFlash('info', 'Commande annulée : les menus ont été remis en stock (+1).');
+                    $this->addFlash('info', 'Commande annulée : ' . $nbPersonnesCommande . ' parts ont été remises en stock.');
                 }
-            }
-
-            if ($statutPrecedent === 'Annulé' && $nouveauStatut !== 'Annulé') {
-                foreach ($commande->getMenus() as $menu) {
-                    $menu->setQuantiteRestante($menu->getQuantiteRestante() - 1);
-                }
-                $commande->setMotifAnnulation(null);
-                $this->addFlash('warning', 'Commande réactivée : les menus ont été retirés du stock (-1).');
             }
 
             if ($statutPrecedent === 'Annulé' && $nouveauStatut !== 'Annulé') {
                 
                 foreach ($commande->getMenus() as $menu) {
-                    if ($menu->getQuantiteRestante() <= 0) {
-                        $this->addFlash('danger', 'Impossible de réactiver cette commande : le menu "' . $menu->getTitre() . '" est en rupture de stock (Quantité : 0).');
+                    if ($menu->getQuantiteRestante() < $nbPersonnesCommande) {
+                        $this->addFlash('danger', 'Impossible de réactiver cette commande : le menu "' . $menu->getTitre() . '" n\'a pas assez de stock disponible (' . $menu->getQuantiteRestante() . ' parts restantes pour ' . $nbPersonnesCommande . ' demandées).');
                         
                         return $this->render('commande/edit.html.twig', [
                             'commande' => $commande,
@@ -408,11 +401,11 @@ final class CommandeController extends AbstractController
                 }
 
                 foreach ($commande->getMenus() as $menu) {
-                    $menu->setQuantiteRestante($menu->getQuantiteRestante() - 1);
+                    $menu->setQuantiteRestante($menu->getQuantiteRestante() - $nbPersonnesCommande);
                 }
                 
                 $commande->setMotifAnnulation(null);
-                $this->addFlash('warning', 'Commande réactivée : les menus ont été retirés du stock (-1).');
+                $this->addFlash('warning', 'Commande réactivée : ' . $nbPersonnesCommande . ' parts ont été retirées du stock.');
             }
 
             $commandeData = $request->request->all('commande');
@@ -431,6 +424,21 @@ final class CommandeController extends AbstractController
                         
                     $mailer->send($email);
                     $this->addFlash('info', 'Le mail de rappel pour le matériel a été envoyé.');
+                }
+            }
+
+            if ($nouveauStatut === 'Livré' && $statutPrecedent !== 'Livré') {
+                $user = $commande->getUtilisateur();
+                if ($user && $user->getEmail()) {
+                    $emailAvis = (new TemplatedEmail())
+                        ->from(new Address('admin@test.com', 'Vite & Gourmand'))
+                        ->to((string)$user->getEmail())
+                        ->subject('Votre avis nous intéresse ! - Commande n°' . $commande->getNumeroCommande())
+                        ->htmlTemplate('emails/invitation_avis.html.twig')
+                        ->context(['user' => $user, 'commande' => $commande]);
+                        
+                    $mailer->send($emailAvis);
+                    $this->addFlash('info', 'Le client a bien été invité par e-mail à laisser une note sur sa prestation.');
                 }
             }
 

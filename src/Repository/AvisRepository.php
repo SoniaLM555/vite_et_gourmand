@@ -15,6 +15,17 @@ class AvisRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Avis::class);
     }
+        /**
+        * @return Avis[]
+        */
+        public function findRandomValidAvis(): array
+        {
+            $avisValides = $this->findBy(['statut' => 'Validé']);
+
+            shuffle($avisValides);
+
+            return array_slice($avisValides, 0, 10);
+        }
 
     //    /**
     //     * @return Avis[] Returns an array of Avis objects

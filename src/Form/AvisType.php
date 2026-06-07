@@ -14,15 +14,16 @@ class AvisType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('commentaire')
-            ->add('note')
-            ->add('statut')
-            ->add('datePublication', null, [
-                'widget' => 'single_text',
+            ->add('note', null, [
+                'label' => 'Votre note (sur 5)',
+                'attr' => [ 'min' => 1,  'max' => 5,  'class' => 'form-control', 'placeholder' => 'Ex: 5'
+                ]
             ])
-            ->add('utilisateur', EntityType::class, [
-                'class' => Utilisateur::class,
-                'choice_label' => 'id',
+            ->add('commentaire', null, [
+                'label' => 'Votre commentaire',
+                'attr' => [
+                    'class' => 'form-control',  'rows' => 4, 'placeholder' => 'Partagez votre expérience avec Julie et José...'
+                ]
             ])
         ;
     }

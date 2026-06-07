@@ -58,24 +58,43 @@
 </section>
 
 
-<section class="py-5 container">
-    <h2 class="display-6 text-center mb-5" style="font-family: 'Playfair Display', serif;">L'avis de nos clients</h2>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for avis in ['Richard', 'Emeline', 'Sofia'] %}
-        <div class="col">
-            <div class="card p-4 border-0 bg-light text-center h-100">
-                {# Affichage des 5 étoiles #}
-                <div class="text-warning mb-3">
-                    {% for i in 1..5 %}
-                        <i class="bi bi-star-fill"></i>
-                    {% endfor %}
-                </div>
-                <p class="fst-italic">"Lorem ipsum dolor sit amet, consectetur adipiscing elit."</p>
-                <h6 class="mt-3 fw-bold">{{ avis }}</h6>
+
+{% if avis is not empty %}
+    <div class="container my-5 py-4 bg-light rounded shadow-sm text-center">
+        <h2 class="h4 fw-bold text-dark mb-4">Ce que nos clients disent de nous</h2>
+        
+        <div id="carouselAvis" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for avi in avis %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}" data-bs-interval="5000">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="p-3">
+                                    <div class="text-warning h5 mb-2">
+                                        {% for i in 1..avi.note %}★{% endfor %}
+                                    </div>
+                                    <p class="fs-5 text-dark fst-italic">"{{ avi.commentaire }}"</p>
+                                    <small class="text-muted fw-bold">
+                                        Par {{ avi.utilisateur.prenom }} {{ avi.utilisateur.nom|slice(0, 1) }}. - le {{ avi.datePublication|date('d/m/Y') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselAvis" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Précédent</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselAvis" data-bs-slide="next">
+                <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Suivant</span>
+            </button>
         </div>
-        {% endfor %}
     </div>
-</section>
+{% endif %}
+
 
 {% endblock %}
