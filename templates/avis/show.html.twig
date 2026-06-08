@@ -17,6 +17,7 @@
                 <th>Note</th>
                 <th>Statut</th>
                 <th>Date</th>
+                <th>Commande</th>
                 <th>Commentaire</th>
                 <th>Actions</th>
             </tr>
@@ -26,13 +27,43 @@
             <tr>
                 <td>{{ avi.id }}</td>
                 <td><span class="badge bg-secondary">{{ avi.note }}/5</span></td>
-                <td>{{ avi.statut }}</td>
+                <td>
+                    {% if avi.statut == 'En attente' %}
+                        <span class="badge bg-warning text-dark">En attente</span>
+                    {% elseif avi.statut == 'Validé' %}
+                        <span class="badge bg-success">Validé</span>
+                    {% else %}
+                        <span class="badge bg-danger">Refusé</span>
+                    {% endif %}
+                </td>
                 <td>{{ avi.datePublication ? avi.datePublication|date('d/m/Y H:i') : '' }}</td>
+                <td>
+                    {% if avi.commande %}
+                        <span class="badge bg-dark">{{ avi.commande.numeroCommande }}</span>
+                        {% if avi.utilisateur %}
+                            <small class="text-muted d-block mt-1">
+                                Client : {{ avi.utilisateur.prenom }} {{ avi.utilisateur.nom|upper }}
+                            </small>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted small">Non rattachée</span>
+                    {% endif %}
+                </td>
                 <td class="text-truncate" style="max-width: 250px;">{{ avi.commentaire }}</td>
                 <td>
                     <div class="d-flex gap-2">
-                        <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
-                        {{ include('avis/_delete_form.html.twig') }}
+                        {% if avi.statut == 'En attente' %}
+                            <form method="post" action="{{ path('app_avis_valider', {'id': avi.id}) }}" onsubmit="return confirm('Voulez-vous vraiment valider cet avis ?');">
+                                <button class="btn btn-sm btn-success">Valider</button>
+                            </form>
+                            <form method="post" action="{{ path('app_avis_refuser', {'id': avi.id}) }}" onsubmit="return confirm('Voulez-vous vraiment refuser cet avis ?');">
+                                <button class="btn btn-sm btn-danger">Refuser</button>
+                            </form>
+                        {% else %}
+                            <span class="badge {{ avi.statut == 'Validé' ? 'bg-success' : 'bg-danger' }} small">
+                                Traité : {{ avi.statut }}
+                            </span>
+                        {% endif %}
                     </div>
                 </td>
             </tr>

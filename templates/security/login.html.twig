@@ -30,6 +30,9 @@
                 <div class="mb-3">
                     <label for="inputPassword" class="form-label">Mot de passe</label>
                     <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                    <div class="text-end mt-2">
+                        <a href="{{ path('app_forgot_password_request') }}" class="text-muted small">Mot de passe oublié ?</a>
+                    </div>
                 </div>
 
                 <div class="mb-3 form-check">

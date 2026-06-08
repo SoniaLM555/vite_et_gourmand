@@ -144,9 +144,33 @@
                             </td>
                             <td>
                                 {% if commande.statut == 'Livré' %}
-                                    <a href="{{ path('app_avis_new', {'commande': commande.id}) }}" class="btn btn-sm btn-warning text-dark fw-bold">
-                                        ★ Donner mon avis
-                                    </a>
+                                    {% set aUnAvisActif = false %}
+                                    {% set aUnAvisRefuse = false %}
+                                    
+                                    {% for unAvis in utilisateur.avis %}
+                                        {% if unAvis.commande and unAvis.commande.id == commande.id %}
+                                            {% if unAvis.statut == 'En attente' or unAvis.statut == 'Validé' %}
+                                                {% set aUnAvisActif = true %}
+                                            {% elseif unAvis.statut == 'Refusé' %}
+                                                {% set aUnAvisRefuse = true %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if aUnAvisActif %}
+                                        <span class="badge bg-secondary">Avis enregistré</span>
+                                    {% elseif aUnAvisRefuse %}
+                                        <div class="d-flex flex-column align-items-start gap-1">
+                                            <a href="{{ path('app_avis_new', {'commande': commande.id}) }}" class="btn btn-sm btn-warning text-dark fw-bold">
+                                                ★ Réécrire l'avis
+                                            </a>
+                                            <small class="text-danger fw-bold" style="font-size: 0.65rem;">Précédent avis refusé ❌</small>
+                                        </div>
+                                    {% else %}
+                                        <a href="{{ path('app_avis_new', {'commande': commande.id}) }}" class="btn btn-sm btn-warning text-dark fw-bold">
+                                            ★ Donner mon avis
+                                        </a>
+                                    {% endif %}
                                 {% else %}
                                     <span class="text-muted small">-</span>
                                 {% endif %}

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AvisRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Commande;
 
 #[ORM\Entity(repositoryClass: AvisRepository::class)]
 class Avis
@@ -29,6 +30,8 @@ class Avis
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $utilisateur = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Commande $commande = null;
 
     public function getCommande(): ?Commande

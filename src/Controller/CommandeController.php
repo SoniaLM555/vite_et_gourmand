@@ -364,6 +364,20 @@ final class CommandeController extends AbstractController
             $nouveauStatut = $commande->getStatut();
             $nbPersonnesCommande = $commande->getNombrePersonne(); 
 
+            if ($nouveauStatut === 'Livré') {
+                $aujourdhui = (new \DateTime())->format('Y-m-d');
+                $datePrestation = $commande->getDatePrestation();
+
+                if ($datePrestation > $aujourdhui) {
+                    $this->addFlash('danger', 'Erreur : Impossible de passer cette commande à "Livré". La date de prestation (' . (new \DateTime($datePrestation))->format('d/m/Y') . ') n\'est pas encore passée.');
+                    
+                    return $this->render('commande/edit.html.twig', [
+                        'commande' => $commande,
+                        'form' => $form->createView(),
+                    ], new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
+                }
+            }
+            
             if ($nouveauStatut === 'Annulé') {
                 $confirmationContact = $form->get('confirmation_contact')->getData();
                 $motifAnnulation = trim((string)$form->get('motif_annulation')->getData());

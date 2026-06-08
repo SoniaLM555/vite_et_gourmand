@@ -16,6 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class AvisController extends AbstractController
 {
     #[Route(name: 'app_avis_index', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function index(AvisRepository $avisRepository): Response
     {
         return $this->render('avis/index.html.twig', [
@@ -28,28 +29,91 @@ final class AvisController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $avi = new Avis();
-
-        $avi->setStatut('En attente');                     
-        $avi->setDatePublication(new \DateTimeImmutable()); 
-        $avi->setUtilisateur($this->getUser());            
+        $avi = new Avis();                     
+        $avi->setDatePublication(new \DateTimeImmutable());  
+        
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $avi->setStatut('Validé');
+        } else {
+            $avi->setStatut('En attente');
+        }
 
         $idCommande = $request->query->get('commande');
         if ($idCommande) {
             $commande = $entityManager->getRepository(\App\Entity\Commande::class)->find($idCommande);
+            
             if ($commande && $commande->getUtilisateur() === $this->getUser()) {
+                
+                $avisBloquant = $entityManager->getRepository(Avis::class)->findOneBy([
+                    'commande' => $commande,
+                    'statut' => ['En attente', 'Validé'] 
+                ]);
+                
+                if ($avisBloquant) {
+                    $this->addFlash('danger', 'Un avis actif est déjà enregistré pour cette commande (Statut : ' . $avisBloquant->getStatut() . ').');
+                    return $this->redirectToRoute('app_home'); 
+                }
+
                 $avi->setCommande($commande);
+                $avi->setUtilisateur($commande->getUtilisateur());
             }
         }
 
-        $form = $this->createForm(AvisType::class, $avi);
+        $form = $this->createForm(AvisType::class, $avi, [
+            'is_admin' => $this->isGranted('ROLE_ADMIN')
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $numeroSaisi = $form->has('numeroCommandeSaisi') ? $form->get('numeroCommandeSaisi')->getData() : null;
+
+            if ($numeroSaisi) {
+                $commande = $entityManager->getRepository(\App\Entity\Commande::class)->findOneBy([
+                    'numeroCommande' => $numeroSaisi
+                ]);
+
+                if (!$commande) {
+                    $this->addFlash('danger', 'Le numéro de commande saisi n\'existe pas.');
+                    return $this->render('avis/new.html.twig', [
+                        'avi' => $avi,
+                        'form' => $form,
+                    ]);
+                }
+
+                $avisBloquantAdmin = $entityManager->getRepository(Avis::class)->findOneBy([
+                    'commande' => $commande,
+                    'statut' => ['En attente', 'Validé'] 
+                ]);
+
+                if ($avisBloquantAdmin) {
+                    $this->addFlash('danger', 'Un avis actif existe déjà pour la commande ' . $numeroSaisi);
+                    return $this->render('avis/new.html.twig', [
+                        'avi' => $avi,
+                        'form' => $form,
+                    ]);
+                }
+
+                $avi->setCommande($commande);
+                $avi->setUtilisateur($commande->getUtilisateur());
+            }
+
+            if (!$avi->getCommande()) {
+                $this->addFlash('danger', 'Erreur : Impossible d\'enregistrer un avis sans numéro de commande valide.');
+                return $this->render('avis/new.html.twig', [
+                    'avi' => $avi,
+                    'form' => $form,
+                ]);
+            }
+
             $entityManager->persist($avi);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Votre avis a été enregistré avec succès et sera publié après validation par notre équipe.');
+            if ($this->isGranted('ROLE_ADMIN')) {
+                $this->addFlash('success', 'L\'avis a été créé et publié automatiquement sur le site.');
+            } else {
+                $this->addFlash('success', 'Votre avis a été enregistré avec succès et sera publié après validation par notre équipe.');
+            }
 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
@@ -101,6 +165,7 @@ final class AvisController extends AbstractController
         return $this->redirectToRoute('app_avis_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/valider', name: 'app_avis_valider', methods: ['POST'])]
     public function valider(Avis $avi, EntityManagerInterface $entityManager): Response
     {
@@ -112,15 +177,15 @@ final class AvisController extends AbstractController
         return $this->redirectToRoute('app_avis_index');
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/refuser', name: 'app_avis_refuser', methods: ['POST'])]
     public function refuser(Avis $avi, EntityManagerInterface $entityManager): Response
     {
-        $entityManager->remove($avi);
+        $avi->setStatut('Refusé');
         $entityManager->flush();
 
-        $this->addFlash('warning', 'L\'avis a été refusé et supprimé de la base de données.');
+        $this->addFlash('warning', 'L\'avis a été refusé et son statut a été mis à jour.');
 
         return $this->redirectToRoute('app_avis_index');
     }
-
 }

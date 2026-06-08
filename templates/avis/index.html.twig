@@ -16,6 +16,7 @@
                 <th>Note</th>
                 <th>Statut</th>
                 <th>Date</th>
+                <th>Commande</th>
                 <th>Commentaire</th>
                 <th>Actions</th>
             </tr>
@@ -36,11 +37,26 @@
                 <td>
                     {% if avi.statut == 'En attente' %}
                         <span class="badge bg-warning text-dark">En attente</span>
-                    {% else %}
+                    {% elseif avi.statut == 'Validé' %}
                         <span class="badge bg-success">Validé</span>
+                    {% else %}
+                        <span class="badge bg-danger">Refusé</span>
                     {% endif %}
                 </td>
                 <td>{{ avi.datePublication ? avi.datePublication|date('d/m/Y H:i') : '' }}</td>
+                <td>
+                    {% if avi.commande %}
+                        <strong class="text-dark">{{ avi.commande.numeroCommande }}</strong>
+                        {% if avi.utilisateur %}
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">
+                                par {{ avi.utilisateur.prenom }} {{ avi.utilisateur.nom|upper }}
+                            </small>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted small">Aucune</span>
+                    {% endif %}
+                </td>
+
                 <td class="text-truncate" style="max-width: 200px;">{{ avi.commentaire }}</td>
                 <td>
                     <div class="d-flex gap-2 align-items-center">
@@ -54,7 +70,6 @@
                                 <button class="btn btn-sm btn-danger">Refuser</button>
                             </form>
                         {% else %}
-                            <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
                         {% endif %}
                     </div>
                 </td>
