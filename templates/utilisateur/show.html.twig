@@ -110,6 +110,7 @@
                             <th>Montant Total</th>
                             <th>Statut</th>
                             <th>Prêt Matériel</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -141,10 +142,19 @@
                                     <span class="text-muted">Non</span>
                                 {% endif %}
                             </td>
+                            <td>
+                                {% if commande.statut == 'Livré' %}
+                                    <a href="{{ path('app_avis_new', {'commande': commande.id}) }}" class="btn btn-sm btn-warning text-dark fw-bold">
+                                        ★ Donner mon avis
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">-</span>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-3">Vous n'avez pas encore passé de commande.</td>
+                            <td colspan="8" class="text-center text-muted py-3">Vous n'avez pas encore passé de commande.</td>
                         </tr>
                     {% endfor %}
                     </tbody>

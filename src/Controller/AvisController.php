@@ -34,6 +34,14 @@ final class AvisController extends AbstractController
         $avi->setDatePublication(new \DateTimeImmutable()); 
         $avi->setUtilisateur($this->getUser());            
 
+        $idCommande = $request->query->get('commande');
+        if ($idCommande) {
+            $commande = $entityManager->getRepository(\App\Entity\Commande::class)->find($idCommande);
+            if ($commande && $commande->getUtilisateur() === $this->getUser()) {
+                $avi->setCommande($commande);
+            }
+        }
+
         $form = $this->createForm(AvisType::class, $avi);
         $form->handleRequest($request);
 
