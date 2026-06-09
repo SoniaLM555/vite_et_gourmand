@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class AvisController extends AbstractController
 {
     #[Route(name: 'app_avis_index', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     public function index(AvisRepository $avisRepository): Response
     {
         return $this->render('avis/index.html.twig', [
@@ -32,7 +32,7 @@ final class AvisController extends AbstractController
         $avi = new Avis();                     
         $avi->setDatePublication(new \DateTimeImmutable());  
         
-        if ($this->isGranted('ROLE_ADMIN')) {
+        if ($this->isGranted('ROLE_EMPLOYE')) {
             $avi->setStatut('Validé');
         } else {
             $avi->setStatut('En attente');
@@ -60,7 +60,7 @@ final class AvisController extends AbstractController
         }
 
         $form = $this->createForm(AvisType::class, $avi, [
-            'is_admin' => $this->isGranted('ROLE_ADMIN')
+            'is_admin' => $this->isGranted('ROLE_EMPLOYE')
         ]);
         $form->handleRequest($request);
 
@@ -109,7 +109,7 @@ final class AvisController extends AbstractController
             $entityManager->persist($avi);
             $entityManager->flush();
 
-            if ($this->isGranted('ROLE_ADMIN')) {
+            if ($this->isGranted('ROLE_EMPLOYE')) {
                 $this->addFlash('success', 'L\'avis a été créé et publié automatiquement sur le site.');
             } else {
                 $this->addFlash('success', 'Votre avis a été enregistré avec succès et sera publié après validation par notre équipe.');
@@ -133,7 +133,7 @@ final class AvisController extends AbstractController
     }
 
     
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/{id}/edit', name: 'app_avis_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Avis $avi, EntityManagerInterface $entityManager): Response
     {
@@ -153,7 +153,7 @@ final class AvisController extends AbstractController
     }
 
     
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/{id}', name: 'app_avis_delete', methods: ['POST'])]
     public function delete(Request $request, Avis $avi, EntityManagerInterface $entityManager): Response
     {
@@ -165,7 +165,7 @@ final class AvisController extends AbstractController
         return $this->redirectToRoute('app_avis_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/{id}/valider', name: 'app_avis_valider', methods: ['POST'])]
     public function valider(Avis $avi, EntityManagerInterface $entityManager): Response
     {
@@ -177,7 +177,7 @@ final class AvisController extends AbstractController
         return $this->redirectToRoute('app_avis_index');
     }
 
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/{id}/refuser', name: 'app_avis_refuser', methods: ['POST'])]
     public function refuser(Avis $avi, EntityManagerInterface $entityManager): Response
     {

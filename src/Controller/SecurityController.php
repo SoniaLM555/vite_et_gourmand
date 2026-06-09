@@ -13,7 +13,7 @@ class SecurityController extends AbstractController
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
        if ($this->getUser()) {
-           if ($this->isGranted('ROLE_ADMIN')) {
+           if ($this->isGranted('ROLE_EMPLOYE')) {
                return $this->redirectToRoute('app_menu_admin_index');
             }
             return $this->redirectToRoute('app_home'); // Espace Client

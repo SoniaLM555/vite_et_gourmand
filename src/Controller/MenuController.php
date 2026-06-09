@@ -42,7 +42,7 @@ final class MenuController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/new', name: 'app_menu_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -71,7 +71,7 @@ final class MenuController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/{id}/edit', name: 'app_menu_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Menu $menu, EntityManagerInterface $entityManager): Response
     {
@@ -90,7 +90,7 @@ final class MenuController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/{id}', name: 'app_menu_delete', methods: ['POST'])]
     public function delete(Request $request, Menu $menu, EntityManagerInterface $entityManager): Response
     {
@@ -102,7 +102,7 @@ final class MenuController extends AbstractController
         return $this->redirectToRoute('app_menu_admin_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/admin/liste', name: 'app_menu_admin_index', methods: ['GET'])]
     public function adminIndex(MenuRepository $menuRepository): Response
     {
@@ -111,7 +111,7 @@ final class MenuController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/admin/{id}', name: 'app_menu_admin_show', methods: ['GET'])]
     public function adminShow(Menu $menu): Response
     {

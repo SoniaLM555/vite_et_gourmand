@@ -28,6 +28,7 @@ final class UtilisateurController extends AbstractController
             ]);
         }
 
+    #[IsGranted('ROLE_EMPLOYE')]    
     #[Route(name: 'app_utilisateur_index', methods: ['GET'])]
     public function index(UtilisateurRepository $utilisateurRepository): Response
     {
@@ -36,6 +37,8 @@ final class UtilisateurController extends AbstractController
         ]);
     }
 
+    
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/new', name: 'app_utilisateur_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -56,6 +59,7 @@ final class UtilisateurController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/{id}', name: 'app_utilisateur_show', methods: ['GET'])]
     public function show(Utilisateur $utilisateur): Response
     {
@@ -76,7 +80,7 @@ final class UtilisateurController extends AbstractController
 
             $this->addFlash('success', 'Vos informations ont bien été mises à jour.');
 
-            if ($this->isGranted('ROLE_ADMIN') and $this->getUser() !== $utilisateur) {
+            if ($this->isGranted('ROLE_EMPLOYE') and $this->getUser() !== $utilisateur) {
                 return $this->redirectToRoute('app_utilisateur_index', [], Response::HTTP_SEE_OTHER);
             }
 
@@ -89,6 +93,7 @@ final class UtilisateurController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/{id}', name: 'app_utilisateur_delete', methods: ['POST'])]
     public function delete(Request $request, Utilisateur $utilisateur, EntityManagerInterface $entityManager): Response
     {
