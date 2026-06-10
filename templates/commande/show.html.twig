@@ -4,6 +4,14 @@
 
 {% block body %}
 
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }} alert-dismissible fade show mb-4" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Commande n°{{ commande.numeroCommande }}</h1>
     <div class="d-flex gap-2">
@@ -170,10 +178,14 @@
                                         Commande validée par l'équipe
                                     {% elseif etape.statut == 'En préparation' %}
                                         Commande en cours de préparation 
-                                    {% elseif etape.statut == 'En attente matériel' %}
-                                        Restitution du matériel en attente 
-                                    {% elseif etape.statut == 'Livré' %}
+                                    {% elseif etape.statut == 'En cours de livraison' or etape.statut == 'en cours de livraison' %}
+                                        Commande en cours de livraison
+                                    {% elseif etape.statut == 'Livré' or etape.statut == 'livré' %}
                                         Commande livrée avec succès 
+                                    {% elseif etape.statut == 'En attente matériel' or etape.statut == 'en attente du retour de matériel' %}
+                                        Restitution du matériel en attente 
+                                    {% elseif etape.statut == 'Terminée' or etape.statut == 'terminée' %}
+                                        Prestation terminée
                                     {% elseif etape.statut == 'Annulé' %}
                                         <span class="text-danger">Commande annulée</span>
                                     {% else %}
