@@ -20,7 +20,6 @@ class CommandeType extends AbstractType
     {
         $builder
             ->add('nombrePersonne', IntegerType::class, ['label' => 'Nombre de convives (personnes)','attr' => ['min' => 1]])
-            ->add('quantite', IntegerType::class, ['label' => 'Nombre de buffets/menus souhaités','data' => 1,'attr' => ['min' => 1]])
             ->add('datePrestation', TextType::class, ['label' => 'Date de la prestation (JJ/MM/AAAA)'])
             ->add('heureLivraison', TextType::class, ['label' => 'Heure souhaitée de livraison (Ex: 12h30)'])
             ->add('pretMateriel', CheckboxType::class, ['label' => 'Souhaitez-vous le prêt de matériel (gratuit, soumis à restitution sous 10 jours) ?','required' => false]);

@@ -6,7 +6,11 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Modification de la commande n°{{ commande.numeroCommande }}</h1>
-        <a href="{{ path('app_commande_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        {% if is_granted('ROLE_EMPLOYE') %}
+            <a href="{{ path('app_commande_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        {% else %}
+            <a href="{{ path('app_utilisateur_profil') }}" class="btn btn-secondary">Retour à mon espace</a>
+        {% endif %}
     </div>
     
     {% for label, messages in app.flashes %}
@@ -22,41 +26,47 @@
     
     <div class="row">
         <div class="col-md-6 mb-3">
+            {% if form.statut is defined %}
             {{ form_row(form.statut, {
                 'label': 'Statut de la commande',
                 'attr': {'class': 'form-select', 'id': 'select-statut'}
             }) }}
+{% endif %}
         </div>
         
-        {% if commande.pretMateriel %}
-            <div class="col-md-6 mb-3" id="zone-restitution-materiel" style="display: none;">
-                {{ form_row(form.restitutionMateriel, {
-                    'label': 'Matériel officiellement restitué ?',
-                    'attr': {'id': 'check-restitution'}
-                }) }}
-            </div>
-        {% else %}
-            {% do form.restitutionMateriel.setRendered() %}
+        {% if form.restitutionMateriel is defined %}
+            {% if commande.pretMateriel %}
+                <div class="col-md-6 mb-3" id="zone-restitution-materiel" style="display: none;">
+                    {{ form_row(form.restitutionMateriel, {
+                        'label': 'Matériel officiellement restitué ?',
+                        'attr': {'id': 'check-restitution'}
+                    }) }}
+                </div>
+            {% else %}
+                {% do form.restitutionMateriel.setRendered() %}
+            {% endif %}
         {% endif %}
     </div>
 
-    <div id="bloc-annulation" class="p-3 bg-light rounded border mb-3" style="display: none;">
-        <h4 class="h6 text-danger fw-bold mb-3">Justificatif d'annulation obligatoire</h4>
-        
-        <div class="form-check mb-3">
-            {{ form_widget(form.confirmation_contact, {'attr': {'class': 'form-check-input'}}) }}
-            <label class="form-check-label small fw-bold text-dark" for="{{ form.confirmation_contact.vars.id }}">
-                Je confirme avoir contacté le client au préalable par appel GSM ou par e-mail.
-            </label>
-        </div>
+    {% if form.confirmation_contact is defined and form.motif_annulation is defined %}
+        <div id="bloc-annulation" class="p-3 bg-light rounded border mb-3" style="display: none;">
+            <h4 class="h6 text-danger fw-bold mb-3">Justificatif d'annulation obligatoire</h4>
+            
+            <div class="form-check mb-3">
+                {{ form_widget(form.confirmation_contact, {'attr': {'class': 'form-check-input'}}) }}
+                <label class="form-check-label small fw-bold text-dark" for="{{ form.confirmation_contact.vars.id }}">
+                    Je confirme avoir contacté le client au préalable par appel GSM ou par e-mail.
+                </label>
+            </div>
 
-        <div class="mb-3">
-            <label for="{{ form.motif_annulation.vars.id }}" class="form-label small fw-bold text-secondary">Motif précis de l'annulation et mode de contact :</label>
-            {{ form_widget(form.motif_annulation, {'attr': {'class': 'form-control form-control-sm', 'rows': '3', 'placeholder': 'Spécifiez la raison de l\'annulation et le mode de contact...'}}) }}
+            <div class="mb-3">
+                <label for="{{ form.motif_annulation.vars.id }}" class="form-label small fw-bold text-secondary">Motif précis de l'annulation et mode de contact :</label>
+                {{ form_widget(form.motif_annulation, {'attr': {'class': 'form-control form-control-sm', 'rows': '3', 'placeholder': 'Spécifiez la raison de l\'annulation et le mode de contact...'}}) }}
+            </div>
         </div>
-    </div>
+    {% endif %}
 
-    <div class="d-none">
+    <div class="col-12 mt-3 pt-3 border-top">
         {{ form_rest(form) }}
     </div>
 
@@ -70,12 +80,11 @@
 <script>
 function initialiserGestionStatuts() {
     const selectStatut = document.getElementById('select-statut') || document.querySelector('select[name="commande[statut]"]');
+    if (!selectStatut) return;
     const blocAnnulation = document.getElementById('bloc-annulation');
     const zoneMateriel = document.getElementById('zone-restitution-materiel');
     
     const aDemandeMateriel = {{ commande.pretMateriel ? 'true' : 'false' }};
-
-    if (!selectStatut) return;
 
     for (let i = 0; i < selectStatut.options.length; i++) {
         const option = selectStatut.options[i];

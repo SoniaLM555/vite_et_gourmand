@@ -61,6 +61,8 @@ class Commande
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $motifAnnulation = null;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $historiqueStatuts = [];
 
     public function __construct()
     {
@@ -253,5 +255,27 @@ class Commande
         return $this;
     }
 
+    public function getHistoriqueStatuts(): ?array
+    {
+        return $this->historiqueStatuts ?? [];
+    }
 
+    public function setHistoriqueStatuts(?array $historiqueStatuts): static
+    {
+        $this->historiqueStatuts = $historiqueStatuts;
+
+        return $this;
+    }
+
+    public function ajouterAlHistorique(string $nouveauStatut): void
+    {
+        if ($this->historiqueStatuts === null) {
+            $this->historiqueStatuts = [];
+        }
+        
+        $this->historiqueStatuts[] = [
+            'statut' => $nouveauStatut,
+            'date_heure' => (new \DateTime())->format('d/m/Y H:i')
+        ];
+    }
 }

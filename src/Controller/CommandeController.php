@@ -293,6 +293,7 @@ final class CommandeController extends AbstractController
         $commande->setPretMateriel($pretMateriel);
         $commande->setRestitutionMateriel(false);
         $commande->setStatut('En attente');
+        $commande->ajouterAlHistorique('En attente');
         $commande->setNumeroCommande('CMD-' . strtoupper(uniqid()));
         $commande->setQuantite(1); 
 
@@ -351,18 +352,45 @@ final class CommandeController extends AbstractController
         return $this->redirectToRoute('app_home');
     }
 
-    #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/{id}/edit', name: 'app_commande_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
     {
-        $form = $this->createForm(CommandeType::class, $commande, ['is_admin' => true]);
+        if (!$this->isGranted('ROLE_EMPLOYE') && ($commande->getUtilisateur() !== $this->getUser() || $commande->getStatut() !== 'En attente')) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas l\'autorisation de modifier cette commande.');
+        }
+        $form = $this->createForm(CommandeType::class, $commande, ['is_admin' => $this->isGranted('ROLE_EMPLOYE')]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             
+            $nouveauNombrePersonnes = $commande->getNombrePersonne();
+            $totalMenusGlobal = 0.0;
+
+            foreach ($commande->getMenus() as $menu) {
+                if ($nouveauNombrePersonnes < $menu->getNombrePersonneMin()) {
+                    $this->addFlash('danger', 'Erreur : Le nombre de personnes ne peut pas être inférieur au minimum du menu (' . $menu->getNombrePersonneMin() . ' pers.).');
+                    return $this->render('commande/edit.html.twig', [
+                        'commande' => $commande,
+                        'form' => $form->createView(),
+                    ], new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
+                }
+
+                $prixBrutMenu = $menu->getPrixParPersonne() * $nouveauNombrePersonnes;
+                if ($nouveauNombrePersonnes >= ($menu->getNombrePersonneMin() + 5)) {
+                    $prixBrutMenu = $prixBrutMenu * 0.90; // -10% de réduction de groupe
+                }
+                $totalMenusGlobal += $prixBrutMenu;
+            }
+
+            $commande->setPrixMenu($totalMenusGlobal);
+
             $statutPrecedent = $entityManager->getUnitOfWork()->getOriginalEntityData($commande)['statut'] ?? null;
             $nouveauStatut = $commande->getStatut();
-            $nbPersonnesCommande = $commande->getNombrePersonne(); 
+            $nbPersonnesCommande = $commande->getNombrePersonne();
+
+            if ($statutPrecedent !== $nouveauStatut) {
+                $commande->ajouterAlHistorique($nouveauStatut);
+            }
 
             if ($nouveauStatut === 'Livré') {
                 $aujourdhui = (new \DateTime())->format('Y-m-d');
@@ -458,8 +486,14 @@ final class CommandeController extends AbstractController
 
             try {
                 $entityManager->flush();
-                $this->addFlash('success', 'Le statut de la commande a bien été mis à jour.');
-                return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
+                $this->addFlash('success', 'La commande a bien été mise à jour.');
+                
+                if ($this->isGranted('ROLE_EMPLOYE')) {
+                    return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
+                }
+                
+                return $this->redirectToRoute('app_utilisateur_profil', [], Response::HTTP_SEE_OTHER);
+
             } catch (\Exception $e) {
                 $this->addFlash('danger', 'Erreur SQL / Système : ' . $e->getMessage());
             }
@@ -467,7 +501,7 @@ final class CommandeController extends AbstractController
 
         return $this->render('commande/edit.html.twig', [
             'commande' => $commande,
-            'form' => $form,
+            'form' => $form->createView(),
         ], new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 
@@ -489,5 +523,28 @@ final class CommandeController extends AbstractController
         }
 
         return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/annuler-client', name: 'app_commande_annuler_client', methods: ['GET'])]
+    public function annulerClient(Commande $commande, EntityManagerInterface $entityManager): Response
+    {
+        if ($commande->getUtilisateur() !== $this->getUser() || $commande->getStatut() !== 'En attente') {
+            $this->addFlash('danger', 'Vous ne pouvez pas annuler cette commande.');
+            return $this->redirectToRoute('app_utilisateur_profil');
+        }
+
+        $commande->setStatut('Annulé');
+        $commande->setMotifAnnulation('Annulée par le client depuis son espace personnel.');
+        $commande->ajouterAlHistorique('Annulé');
+
+        $nbPersonnes = $commande->getNombrePersonne();
+        foreach ($commande->getMenus() as $menu) {
+            $menu->setQuantiteRestante($menu->getQuantiteRestante() + $nbPersonnes);
+        }
+
+        $entityManager->flush();
+        $this->addFlash('success', 'Votre commande a été annulée avec succès et les stocks ont été mis à jour.');
+
+        return $this->redirectToRoute('app_utilisateur_profil');
     }
 }

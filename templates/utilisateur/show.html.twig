@@ -116,7 +116,9 @@
                     <tbody>
                     {% for commande in utilisateur.commandes %}
                         <tr>
-                            <td><strong class="text-dark">{{ commande.numeroCommande }}</strong></td>
+                            <td>
+                                <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="text-decoration-none fw-bold text-dark">{{ commande.numeroCommande }}</a>
+                            </td>
                             <td>{{ commande.datePrestation }}</td>
                             <td>{{ commande.heureLivraison }}</td>
                             <td>{{ commande.nombrePersonne }} pers.</td>
@@ -136,14 +138,18 @@
                                 {% if commande.pretMateriel %}
                                     <span class="text-success fw-bold">Oui</span>
                                     <small class="text-muted d-block" style="font-size:0.72rem;">
-                                        ({{ commande.restitutionMateriel ? 'Restitué ✅' : 'À restituer sous 10j ⚠️' }})
+                                        ({{ commande.restitutionMateriel ? 'Restitué ' : 'À restituer sous 10j ' }})
                                     </small>
                                 {% else %}
                                     <span class="text-muted">Non</span>
                                 {% endif %}
                             </td>
                             <td>
-                                {% if commande.statut == 'Livré' %}
+                                {% if commande.statut == 'En attente' %}
+                                    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-sm btn-warning text-dark fw-bold">Modifier</a>
+                                    <a href="{{ path('app_commande_annuler_client', {'id': commande.id}) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Voulez-vous vraiment annuler cette commande ?');">Annuler</a>
+                                    
+                                {% elseif commande.statut == 'Livré' %}
                                     {% set aUnAvisActif = false %}
                                     {% set aUnAvisRefuse = false %}
                                     
@@ -160,16 +166,10 @@
                                     {% if aUnAvisActif %}
                                         <span class="badge bg-secondary">Avis enregistré</span>
                                     {% elseif aUnAvisRefuse %}
-                                        <div class="d-flex flex-column align-items-start gap-1">
-                                            <a href="{{ path('app_avis_new', {'commande': commande.id}) }}" class="btn btn-sm btn-warning text-dark fw-bold">
-                                                ★ Réécrire l'avis
-                                            </a>
-                                            <small class="text-danger fw-bold" style="font-size: 0.65rem;">Précédent avis refusé ❌</small>
-                                        </div>
+                                        <a href="{{ path('app_avis_new', {'commande': commande.id}) }}" class="btn btn-sm btn-warning text-dark fw-bold">★ Réécrire l'avis</a>
+                                        <small class="text-danger fw-bold d-block" style="font-size: 0.65rem;">Avis refusé </small>
                                     {% else %}
-                                        <a href="{{ path('app_avis_new', {'commande': commande.id}) }}" class="btn btn-sm btn-warning text-dark fw-bold">
-                                            ★ Donner mon avis
-                                        </a>
+                                        <a href="{{ path('app_avis_new', {'commande': commande.id}) }}" class="btn btn-sm btn-warning text-dark fw-bold">★ Donner mon avis</a>
                                     {% endif %}
                                 {% else %}
                                     <span class="text-muted small">-</span>

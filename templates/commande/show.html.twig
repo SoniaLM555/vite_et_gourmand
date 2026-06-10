@@ -4,48 +4,141 @@
 
 {% block body %}
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Commande n°{{ commande.numeroCommande }}</h1>
-        <a href="{{ path('app_commande_index') }}" class="btn btn-secondary">Retour à la liste</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Commande n°{{ commande.numeroCommande }}</h1>
+    <div class="d-flex gap-2">
+        {% if is_granted('ROLE_EMPLOYE') or commande.statut == 'En attente' %}
+            <a href="/commande/{{ commande.id }}/edit" class="btn btn-outline-secondary">Modifier la commande</a>
+        {% endif %}
+        
+        {% if is_granted('ROLE_EMPLOYE') %}
+            <a href="{{ path('app_commande_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        {% else %}
+            <a href="{{ path('app_utilisateur_profil') }}" class="btn btn-secondary">Retour</a>
+        {% endif %}
+    </div>
+</div>   
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm p-4 bg-white rounded h-100 d-flex flex-column">
+            <h3 class="h5 mb-4 text-secondary border-bottom pb-2">1. Détail de la commande et tarification</h3>
+            
+            {% for menu in commande.menus %}
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <div class="flex-grow-1">
+                        <h4 class="h6 font-weight-bold text-dark mb-1">{{ menu.titre }}</h4>
+                        <small class="text-muted d-block mb-2">Tarif unitaire : {{ menu.prixParPersonne }} € / pers.</small>
+                        
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge bg-light text-dark border px-3 py-1 font-weight-bold">Pour {{ commande.nombrePersonne }} pers.</span>
+                        </div>
+                    </div>
+                    <div class="text-end ms-3">
+                        <span class="d-block font-weight-bold text-dark h6 mb-1">{{ commande.prixMenu|number_format(2, ',', ' ') }} €</span>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <div class="bg-light p-3 rounded border mb-3 mt-auto">
+                <div class="d-flex justify-content-between small text-secondary mb-2">
+                    <span>Sous-total buffets :</span>
+                    <span class="fw-bold text-dark">{{ commande.prixMenu|number_format(2, ',', ' ') }} €</span>
+                </div>
+                <div class="d-flex justify-content-between small text-secondary mb-2">
+                    <span>Frais de logistique :</span>
+                    <span class="fw-bold text-success">
+                        {% if commande.prixLivraison == 0 %}
+                            Gratuit (Zone Bordeaux)
+                        {% else %}
+                            {{ commande.prixLivraison|number_format(2, ',', ' ') }} €
+                        {% endif %}
+                    </span>
+                </div>
+                <hr class="my-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong class="text-dark">Montant Total :</strong>
+                    <strong class="text-success h4 mb-0">
+                        {{ (commande.prixMenu + commande.prixLivraison)|number_format(2, ',', ' ') }} €
+                    </strong>
+                </div>
+            </div>
+
+            <div class="p-2 bg-light rounded border">
+                <span class="small text-dark fw-bold">Option Prêt Matériel :</span>
+                {% if commande.pretMateriel %}
+                    <span class="badge bg-success ms-2">Oui</span>
+                    <small class="text-muted d-block mt-1" style="font-size:0.75rem;">
+                        ({{ commande.restitutionMateriel ? 'Restitué ✅' : 'À restituer sous 10j ⚠️' }})
+                    </small>
+                {% else %}
+                    <span class="badge bg-secondary ms-2">Non</span>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Numéro</th>
-                <th>Date de prestation</th>
-                <th>Nb pers.</th>
-                <th>Prix total</th>
-                <th>Statut</th>
-                <th>Matériel</th>
-                <th>Action</th>
-            </tr>
-        </thead>
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm p-4 bg-white rounded h-100 d-flex flex-column">
+            <h3 class="h5 mb-4 text-secondary border-bottom pb-2">2. Informations de livraison et prestation</h3>
+            
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <label class="form-label small fw-bold text-muted mb-0">Nom :</label>
+                    <div class="fw-bold text-dark">{{ commande.utilisateur.nom|upper }}</div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label small fw-bold text-muted mb-0">Prénom :</label>
+                    <div class="fw-bold text-dark">{{ commande.utilisateur.prenom }}</div>
+                </div>
+            </div>
 
-        <tbody>
-            <tr>
-                <td>{{ commande.id }}</td>
-                <td>{{ commande.numeroCommande }}</td>
-                <td>{{ commande.datePrestation ? commande.datePrestation|date('d/m/Y') : '' }}  à {{ commande.heureLivraison }}</td>
-                <td>{{ commande.nombrePersonne }}</td>
-                <td>{{ (commande.prixMenu + commande.prixLivraison) }} €</td>
-                <td><span class="badge bg-secondary">{{ commande.statut }}</span></td>
-                <td>
-                    {% if commande.pretMateriel %}
-                        <span class="text-success">Oui</span> ({{ commande.restitutionMateriel ? 'Rendu' : 'À récupérer' }})
-                    {% else %}
-                        <span class="text-muted">Non</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <div class="d-flex gap-2">
-                        <a href="/commande/{{ commande.id }}/edit" class="btn btn-sm btn-outline-secondary">Modifier</a>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted mb-0">Adresse Email :</label>
+                <div class="fw-bold text-dark">{{ commande.utilisateur.email }}</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted mb-0">GSM (Téléphone) :</label>
+                <div class="fw-bold text-dark">{{ commande.utilisateur.telephone ?? 'Non renseigné' }}</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small text-secondary fw-bold mb-0">Adresse de la prestation :</label>
+                <div class="fw-bold text-dark">{{ commande.adressePrestation ?? commande.utilisateur.adressePostale }}</div>
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-4">
+                    <label class="form-label small text-secondary fw-bold mb-0">Code Postal :</label>
+                    <div class="fw-bold text-dark">{{ commande.codePostalPrestation ?? commande.utilisateur.codePostal ?? 'N/C' }}</div>
+                </div>
+                <div class="col-8">
+                    <label class="form-label small text-secondary fw-bold mb-0">Ville de la prestation :</label>
+                    <div class="fw-bold text-dark">{{ commande.villePrestation ?? commande.utilisateur.ville }}</div>
+                </div>
+            </div>
+
+            <div class="row g-2 mb-4">
+                <div class="col-6">
+                    <label class="form-label small text-secondary fw-bold mb-0">Date souhaitée :</label>
+                    <div class="fw-bold text-dark">{{ commande.datePrestation ? commande.datePrestation|date('d/m/Y') : '' }}</div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label small text-secondary fw-bold mb-0">Heure de livraison :</label>
+                    <div class="fw-bold text-dark">{{ commande.heureLivraison }}</div>
+                </div>
+            </div>
+
+            <div class="mt-auto p-3 rounded border bg-light">
+                <span class="text-muted small d-block">Statut actuel du traitement :</span>
+                <span class="badge bg-secondary fs-6 mt-1">{{ commande.statut }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
     
     {% if commande.statut == 'Annulé' and commande.motifAnnulation is defined and commande.motifAnnulation is not empty %}
         <div class="card bg-light border-danger mt-4 shadow-sm">
@@ -57,5 +150,46 @@
             </div>
         </div>
     {% endif %}
-
+    
+    <div class="card p-4 shadow-sm mt-5 bg-white border-0 rounded">
+        <h3 class="h5 mb-4 text-secondary border-bottom pb-2">Historique de la commande</h3>
+        
+        {% if commande.historiqueStatuts is defined and commande.historiqueStatuts is not empty %}
+            <div class="position-relative ps-4 border-start border-2 border-secondary ms-2 mt-3">
+                {% for etape in commande.historiqueStatuts %}
+                    <div class="mb-4 position-relative">
+                        <span class="position-absolute start-0 top-0 translate-middle-x bg-dark rounded-circle" 
+                              style="width: 12px; height: 12px; margin-left: -25px; margin-top: 6px;"></span>
+                        
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+                            <div>
+                                <span class="fw-bold text-dark fs-6">
+                                    {% if etape.statut == 'En attente' %}
+                                        Commande enregistrée (En attente de validation)
+                                    {% elseif etape.statut == 'Accepté' %}
+                                        Commande validée par l'équipe
+                                    {% elseif etape.statut == 'En préparation' %}
+                                        Commande en cours de préparation 
+                                    {% elseif etape.statut == 'En attente matériel' %}
+                                        Restitution du matériel en attente 
+                                    {% elseif etape.statut == 'Livré' %}
+                                        Commande livrée avec succès 
+                                    {% elseif etape.statut == 'Annulé' %}
+                                        <span class="text-danger">Commande annulée</span>
+                                    {% else %}
+                                        {{ etape.statut }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="text-muted small mt-1 mt-sm-0">
+                                Le <strong>{{ etape.date_heure }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted mb-0 small"><em>Aucun historique disponible pour le moment. Statut actuel : {{ commande.statut }}</em></p>
+        {% endif %}
+    </div>
 {% endblock %}
