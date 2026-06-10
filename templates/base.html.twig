@@ -306,32 +306,7 @@
                     <div class="row align-items-center justify-content-around mb-5 g-0">
                         
                         <div class="col-5 col-md-4 d-flex justify-content-center p-0">
-                            <div style="width: 100%; max-width: 180px;">
-                                <h5 class="footer-title mb-3 text-center" style="font-size: 0.75rem;">Nos horaires</h5>
-                                <div class="footer-text">
-                                    <div class="d-flex justify-content-between border-bottom border-secondary py-1 mb-1">
-                                        <span>Lundi</span><span>Fermé</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between border-bottom border-secondary py-1 mb-1">
-                                        <span>Mardi</span><span>11h-23h</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between border-bottom border-secondary py-1 mb-1">
-                                        <span>Mercredi</span><span>11h-23h</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between border-bottom border-secondary py-1 mb-1">
-                                        <span>Jeudi</span><span>11h-23h</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between border-bottom border-secondary py-1 mb-1">
-                                        <span>Vendredi</span><span>11h-23h</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between border-bottom border-secondary py-1 mb-1">
-                                        <span>Samedi</span><span>11h-23h</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between py-1">
-                                        <span>Dimanche</span><span>Fermé</span>
-                                    </div>
-                                </div>
-                            </div>
+                            {{ render(controller('App\\Controller\\HoraireController::footerList')) }}
                         </div>
 
                         <div class="col-6 col-md-4 d-flex justify-content-center p-0">

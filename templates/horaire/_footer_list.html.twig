@@ -1,0 +1,17 @@
+<div style="width: 100%; max-width: 180px;">
+    <h5 class="footer-title mb-3 text-center" style="font-size: 0.75rem;">Nos horaires</h5>
+    <div class="footer-text">
+        {% for horaire in horaires %}
+            <div class="d-flex justify-content-between border-bottom border-secondary py-1 mb-1">
+                <span>{{ horaire.jour }}</span>
+                <span>
+                    {% if horaire.heureOuverture|lower == 'fermé' or horaire.heureOuverture is empty %}
+                        Fermé
+                    {% else %}
+                        {{ horaire.heureOuverture }} - {{ horaire.heureFermeture }}
+                    {% endif %}
+                </span>
+            </div>
+        {% endfor %}
+    </div>
+</div>
