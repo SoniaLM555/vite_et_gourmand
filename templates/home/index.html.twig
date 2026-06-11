@@ -17,7 +17,7 @@
 <section class="py-5 container">
     <div class="row align-items-center py-5">
         <div class="col-md-6">
-            <img src="{{ asset('images/restaurant_gastronimique_presentation.jpg') }}" class="img-fluid" alt="Qui sommes-nous" style="height: 500px; width: 100%; object-fit: cover;">
+            <img src="{{ asset('images/restaurant_gastronimique_presentation.jpg') }}" class="img-fluid" alt="Photo de la salle du restaurant gastronomique de Julie et José" style="height: 500px; width: 100%; object-fit: cover;">
         </div>
         <div class="col-md-6 ps-md-5">
             <h2 class="display-6 mb-4" style="font-family: 'Playfair Display', serif;">Qui sommes-nous?</h2>
@@ -37,7 +37,7 @@
             {% for menu in menus %}
             <div class="col">
                 <div class="card h-100 border-0 shadow-sm rounded-0">
-                    <img src="{{ asset('images/' ~ (menu.imageName ?? 'default.jpg')) }}" class="card-img-top rounded-0" alt="{{ menu.titre }}" style="height: 200px; width: 100%; object-fit: cover;">
+                    <img src="{{ asset('images/' ~ (menu.imageName ?? 'default.jpg')) }}" class="card-img-top rounded-0" alt="Photo d'illustration du menu premium :{{ menu.titre }}" style="height: 200px; width: 100%; object-fit: cover;">
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ menu.titre }}</h5>
                         <p class="fw-bold">{{ menu.prixParPersonne }} €</p>
@@ -73,7 +73,7 @@
                         <div class="row justify-content-center">
                             <div class="col-md-8">
                                 <div class="p-3">
-                                    <div class="text-warning h5 mb-2">
+                                   <div class="text-warning fs-5 mb-2">
                                         {% for i in 1..avi.note %}★{% endfor %}
                                     </div>
                                     <p class="fs-5 text-dark fst-italic">"{{ avi.commentaire }}"</p>
@@ -87,11 +87,11 @@
                 {% endfor %}
             </div>
             
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselAvis" data-bs-slide="prev">
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselAvis" data-bs-slide="prev" aria-label="Avis précédent">
                 <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
                 <span class="visually-hidden">Précédent</span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselAvis" data-bs-slide="next">
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselAvis" data-bs-slide="next" aria-label="Avis suivant">
                 <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
                 <span class="visually-hidden">Suivant</span>
             </button>
