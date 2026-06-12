@@ -39,9 +39,9 @@
                 <div class="card h-100 border-0 shadow-sm rounded-0">
                     <img src="{{ asset('images/' ~ (menu.imageName ?? 'default.jpg')) }}" class="card-img-top rounded-0" alt="Photo d'illustration du menu premium :{{ menu.titre }}" style="height: 200px; width: 100%; object-fit: cover;">
                     <div class="card-body text-center">
-                        <h5 class="card-title">{{ menu.titre }}</h5>
+                        <h3 class="card-title h5">{{ menu.titre }}</h3>
                         <p class="fw-bold">{{ menu.prixParPersonne }} €</p>
-                        <p class="small text-muted mb-2">
+                        <p class="small .text-secondary mb-2">
                             Minimum {{ menu.nombrePersonneMin }} personnes.
                         </p>
                     </div>
@@ -77,7 +77,7 @@
                                         {% for i in 1..avi.note %}★{% endfor %}
                                     </div>
                                     <p class="fs-5 text-dark fst-italic">"{{ avi.commentaire }}"</p>
-                                    <small class="text-muted fw-bold">
+                                    <small class="text-dark fw-bold">
                                         Par {{ avi.utilisateur.prenom }} {{ avi.utilisateur.nom|slice(0, 1) }}. - le {{ avi.datePublication|date('d/m/Y') }}
                                     </small>
                                 </div>
