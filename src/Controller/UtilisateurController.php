@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Entity\Role; 
 use App\Form\UtilisateurType;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 
 #[Route('/utilisateur')]
@@ -40,21 +42,34 @@ final class UtilisateurController extends AbstractController
     
     #[IsGranted('ROLE_EMPLOYE')]
     #[Route('/new', name: 'app_utilisateur_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
         $utilisateur = new Utilisateur();
         $form = $this->createForm(UtilisateurType::class, $utilisateur);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            
+            $roleId = $this->isGranted('ROLE_ADMIN') ? 2 : 3;
+            $role = $entityManager->getRepository(Role::class)->find($roleId);
+            $utilisateur->setRoleObjet($role);
+
+            if ($this->isGranted('ROLE_ADMIN')) {
+                $utilisateur->setIsVerified(true);
+            }
+
+            if ($utilisateur->getPassword()) {
+                $hashedPassword = $passwordHasher->hashPassword($utilisateur, $utilisateur->getPassword());
+                $utilisateur->setPassword($hashedPassword);
+            }
+
             $entityManager->persist($utilisateur);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_utilisateur_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_utilisateur_index');
         }
 
         return $this->render('utilisateur/new.html.twig', [
-            'utilisateur' => $utilisateur,
             'form' => $form,
         ]);
     }
@@ -93,15 +108,29 @@ final class UtilisateurController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_EMPLOYE')]
-    #[Route('/{id}', name: 'app_utilisateur_delete', methods: ['POST'])]
-    public function delete(Request $request, Utilisateur $utilisateur, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$utilisateur->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($utilisateur);
-            $entityManager->flush();
-        }
 
-        return $this->redirectToRoute('app_utilisateur_index', [], Response::HTTP_SEE_OTHER);
+    #[IsGranted('ROLE_EMPLOYE')]
+    #[Route('/{id}/toggle', name: 'app_utilisateur_toggle', methods: ['POST'])]
+    public function toggle(Utilisateur $utilisateur, EntityManagerInterface $entityManager): Response
+    {
+        if ($utilisateur->isVerified()) {
+            $utilisateur->setIsVerified(false);
+            
+            $nouveauEmail = $utilisateur->getEmail() . '_ARCHIVE_' . time();
+            $utilisateur->setEmail($nouveauEmail);
+        } 
+        else {
+            $utilisateur->setIsVerified(true);
+            
+            $emailActuel = $utilisateur->getEmail();
+            if (str_contains($emailActuel, '_ARCHIVE_')) {
+                $emailOriginal = explode('_ARCHIVE_', $emailActuel)[0];
+                $utilisateur->setEmail($emailOriginal);
+            }
+        }
+        
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_utilisateur_show', ['id' => $utilisateur->getId()]);
     }
 }

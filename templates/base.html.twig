@@ -80,13 +80,11 @@
 
                 .footer-text {
                     font-family: var(--font-main);
-                    /* Un chouïa plus petit pour être sûr que ça rentre dans les 5 colonnes */
                     font-size: clamp(0.6rem, 1.2vw, 0.75rem); 
                 }
 
                 .footer-logo {
                     font-family: var(--font-title);
-                    /* On s'assure que le minimum est assez petit pour mobile (1rem) */
                     font-size: clamp(1rem, 2.5vw, 1.8rem); 
                     font-weight: 700;
                     margin: 0;
@@ -128,7 +126,7 @@
                     color: #606060 !important;
                     background-color: transparent !important;
                     border-radius: 6px !important;
-                    text-align: left; /* Aligne le texte à gauche comme un select */
+                    text-align: left; 
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -224,7 +222,8 @@
                                         Administration
                                     </a>
                                     <ul class="dropdown-menu">
-                                        {# Section Carte #}
+                                        <li><a class="dropdown-item fw-bold text-primary" href="{{ path('app_admin_dashboard') }}">Tableau de bord</a></li>
+                                        <li><hr class="dropdown-divider"></li>
                                         <li><h6 class="dropdown-header">Gestion Carte</h6></li>
                                         <li><a class="dropdown-item" href="{{ path('app_plat_index') }}">Plats</a></li>
                                         <li><a class="dropdown-item" href="{{ path('app_menu_admin_index') }}">Menus</a></li>
@@ -234,7 +233,6 @@
                                         
                                         <li><hr class="dropdown-divider"></li>
                                         
-                                        {# Section Client #}
                                         <li><h6 class="dropdown-header">Espace Client</h6></li>
                                         <li><a class="dropdown-item" href="{{ path('app_utilisateur_index') }}">Utilisateurs</a></li>
                                         <li><a class="dropdown-item" href="{{ path('app_commande_index') }}">Commandes</a></li>
@@ -242,7 +240,6 @@
                                         
                                         <li><hr class="dropdown-divider"></li>
                                         
-                                        {# Section Config #}
                                         <li><h6 class="dropdown-header">Configuration</h6></li>
                                         <li><a class="dropdown-item" href="{{ path('app_horaire_index') }}">Horaires</a></li>
                                         <li><a class="dropdown-item" href="{{ path('app_role_index') }}">Rôles</a></li>

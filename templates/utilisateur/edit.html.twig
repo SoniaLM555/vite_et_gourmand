@@ -23,7 +23,11 @@
         <button type="submit" form="form-utilisateur" class="btn btn-dark">Mettre à jour mes informations</button>
         
         {% if is_granted('ROLE_ADMIN') and app.user != utilisateur %}
-            {{ include('utilisateur/_delete_form.html.twig') }}
+            <form method="post" action="{{ path('app_utilisateur_toggle', {'id': utilisateur.id}) }}" onsubmit="return confirm('Confirmer le changement de statut ?');">
+                <button class="btn btn-sm btn-outline-danger">
+                    {{ utilisateur.isVerified ? 'Désactiver le compte' : 'Réactiver le compte' }}
+                </button>
+            </form>
         {% endif %}
     </div>
 
