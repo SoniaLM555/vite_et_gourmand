@@ -27,64 +27,75 @@ class AdminDashboardController extends AbstractController
            ->innerJoin('cm', 'menu', 'm', 'cm.menu_id = m.id')
            ->groupBy('m.titre');
 
-        if ($dateDebut) {
-            $qb->andWhere('c.date_prestation >= :dateDebut')
-               ->setParameter('dateDebut', $dateDebut);
-        }
-        if ($dateFin) {
-            $qb->andWhere('c.date_prestation <= :dateFin')
-               ->setParameter('dateFin', $dateFin);
-        }
-        if ($menuFiltre) {
-            $qb->andWhere('m.titre = :menuFiltre')
-               ->setParameter('menuFiltre', $menuFiltre);
-        }
+        if ($dateDebut) $qb->andWhere('c.date_prestation >= :debut')->setParameter('debut', $dateDebut);
+        if ($dateFin) $qb->andWhere('c.date_prestation <= :fin')->setParameter('fin', $dateFin);
+        if ($menuFiltre) $qb->andWhere('m.titre = :menu')->setParameter('menu', $menuFiltre);
 
         $totalChiffreAffaires = $qb->executeQuery()->fetchAllAssociative();
 
         $utilisateurs = $connection->createQueryBuilder()
-            ->select('u.id', 'u.email', 'u.nom', 'u.prenom', 'u.ville', 'u.is_verified AS isVerified', 'r.libelle AS role_nom') // <-- CORRIGÉ ICI
+            ->select('u.id', 'u.email', 'u.nom', 'u.prenom', 'u.ville', 'u.is_verified AS isVerified', 'r.libelle AS role_nom', 'u.roles')
             ->from('utilisateur', 'u')
             ->innerJoin('u', 'role', 'r', 'u.role_objet_id = r.id')
             ->executeQuery()
             ->fetchAllAssociative();
+        foreach ($utilisateurs as &$u) { $u['roles'] = json_decode($u['roles'] ?? '[]', true); $u['isActive'] = true; }
 
-        foreach ($utilisateurs as &$u) {
-            $u['roles'] = json_decode($u['roles'] ?? '[]', true);
-            $u['isActive'] = true; // Sécurité pour ton template Twig
-        }
+        $tousLesMenus = $connection->createQueryBuilder()->select('titre')->from('menu')->orderBy('titre', 'ASC')->executeQuery()->fetchAllAssociative();
 
-        $statsNoSQL = [];
+        $caTotalNoSQL = 0; $statsNoSQL = []; $caParMenuNoSQL = [];
         try {
             $mongoClient = new Client("mongodb://localhost:27017");
-            $collection = $mongoClient->vite_et_gourmand->commandes_stats;
+            $collection = $mongoClient->vite_et_gourmand->ventes;
 
-            $pipeline = [
-                ['$group' => ['_id' => '$menu_nom', 'volume' => ['$sum' => '$quantite']]]
-            ];
-            
-            $cursor = $collection->aggregate($pipeline);
-
-            foreach ($cursor as $document) {
-                $statsNoSQL[] = [
-                    'menu' => $document['_id'],
-                    'volume' => $document['volume']
-                ];
+            $match = [];
+            if ($menuFiltre) {
+                $match['items.menu_nom'] = $menuFiltre;
             }
-        } catch (\Exception $e) {
-            $statsNoSQL = [
-                ['menu' => 'Menu Express', 'volume' => 12],
-                ['menu' => 'Menu Gourmet', 'volume' => 8],
-                ['menu' => 'Menu Fêtes', 'volume' => 15]
-            ];
-        }
+            if ($dateDebut || $dateFin) {
+                $match['date_commande'] = [];
+                if ($dateDebut) $match['date_commande']['$gte'] = $dateDebut;
+                if ($dateFin) $match['date_commande']['$lte'] = $dateFin;
+            }
 
-        return $this->render('utilisateur/index.html.twig', [
-            'totalChiffreAffaires' => $totalChiffreAffaires,
-            'statsNoSQL' => $statsNoSQL,
-            'utilisateurs' => $utilisateurs 
-        ]);
-    }
+            $pipelineMatch = !empty($match) ? ['$match' => $match] : null;
+            
+            $matchItem = $menuFiltre ? ['$match' => ['items.menu_nom' => $menuFiltre]] : null;
+
+            $stagesVolume = [['$unwind' => '$items']];
+            if ($matchItem) $stagesVolume[] = $matchItem; 
+            $stagesVolume[] = ['$group' => ['_id' => '$items.menu_nom', 'volume' => ['$sum' => '$items.quantite']]];
+            
+            if ($pipelineMatch) array_unshift($stagesVolume, $pipelineMatch);
+            
+            $cursorVolume = $collection->aggregate($stagesVolume);
+            foreach ($cursorVolume as $doc) { $statsNoSQL[] = ['menu' => $doc['_id'], 'volume' => $doc['volume']]; }
+
+            $stagesCA = [['$unwind' => '$items']];
+            if ($matchItem) $stagesCA[] = $matchItem; 
+            $stagesCA[] = ['$group' => ['_id' => '$items.menu_nom', 'ca_menu' => ['$sum' => ['$multiply' => ['$items.prix_menu_unitaire', '$items.quantite']]]]];
+            
+            if ($pipelineMatch) array_unshift($stagesCA, $pipelineMatch);
+            
+            $cursorCAparMenu = $collection->aggregate($stagesCA);
+            foreach ($cursorCAparMenu as $doc) { $caParMenuNoSQL[] = ['menu' => $doc['_id'], 'ca' => $doc['ca_menu']]; }
+
+            $pipelineTotal = $pipelineMatch ? [$pipelineMatch] : [];
+            $pipelineTotal[] = ['$group' => ['_id' => null, 'total_ca' => ['$sum' => ['$add' => ['$total_commande_hors_livraison', '$frais_livraison']]]]];
+            
+            $cursorCA = $collection->aggregate($pipelineTotal)->toArray();
+            if (!empty($cursorCA)) { $caTotalNoSQL = $cursorCA[0]['total_ca']; }
+
+        } catch (\Exception $e) {
+        }
+        
+
+                return $this->render('utilisateur/index.html.twig', [
+                    'totalChiffreAffaires' => $totalChiffreAffaires, 'caTotalNoSQL' => $caTotalNoSQL, 
+                    'caParMenuNoSQL' => $caParMenuNoSQL, 'statsNoSQL' => $statsNoSQL,
+                    'utilisateurs' => $utilisateurs, 'tousLesMenus' => $tousLesMenus
+                ]);
+            }
 
     #[Route('/admin/utilisateur/{id}/toggle', name: 'app_utilisateur_toggle', methods: ['POST'])]
     public function toggleUser(int $id, Connection $connection): Response
@@ -108,7 +119,7 @@ class AdminDashboardController extends AbstractController
                 ->setParameter('id', $id)
                 ->executeStatement();
 
-            $this->addFlash('success', 'Le statut de l\'employé a bien été mis à jour en base de données.');
+            $this->addFlash('success', 'Le statut de l\'utilisateur a bien été mis à jour.');
         }
 
         return $this->redirectToRoute('app_admin_dashboard');

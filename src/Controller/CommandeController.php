@@ -6,6 +6,7 @@ use App\Entity\Commande;
 use App\Entity\Menu;
 use App\Form\CommandeType;
 use App\Repository\CommandeRepository;
+use App\Service\StatistiqueService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use MongoDB\Client;
+
 
 #[Route('/commande')]
 final class CommandeController extends AbstractController
@@ -112,27 +115,23 @@ final class CommandeController extends AbstractController
             $menu = $entityManager->getRepository(Menu::class)->find($menuId);
             
             if ($menu) {
-                $prixBrutMenu = $menu->getPrixParPersonne() * $nbPersonnes;
-                
-                $aDroitAuDixPourcent = $nbPersonnes >= ($menu->getNombrePersonneMin() + 5);
-                $montantRemise = 0.0;
-                
-                if ($aDroitAuDixPourcent) {
-                    $montantRemise = $prixBrutMenu * 0.10;
-                }
+            $prixBrutLigne = $menu->getPrixParPersonne() * $nbPersonnes;
+            
+            $aDroitRemise = $nbPersonnes >= ($menu->getNombrePersonneMin() + 5);
+            $montantRemise = $aDroitRemise ? ($prixBrutLigne * 0.10) : 0.0;
+            
+            $prixFinalLigne = $prixBrutLigne - $montantRemise;
+            $totalMenusGlobal += $prixFinalLigne; // Ajoute le net au total
 
-                $prixFinalPourCeMenu = $prixBrutMenu - $montantRemise;
-                $totalMenusGlobal += $prixFinalPourCeMenu;
-
-                $elementsPanier[] = [
-                    'menu' => $menu,
-                    'nbPersonnes' => $nbPersonnes,
-                    'prixBrut' => $prixBrutMenu,
-                    'remise' => $montantRemise,
-                    'prixFinal' => $prixFinalPourCeMenu,
-                    'aRemise' => $aDroitAuDixPourcent
-                ];
-            }
+            $elementsPanier[] = [
+                'menu' => $menu,
+                'nbPersonnes' => $nbPersonnes,
+                'prixBrut' => $prixBrutLigne, 
+                'remise' => $montantRemise,
+                'prixFinal' => $prixFinalLigne,
+                'aRemise' => $aDroitRemise
+            ];
+        }
         }
 
         $villeClient = strtolower(trim($user->getVille()));
@@ -353,7 +352,7 @@ final class CommandeController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_commande_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
+    public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager, MailerInterface $mailer, StatistiqueService $statistiqueService): Response
     {
         if (!$this->isGranted('ROLE_EMPLOYE') && ($commande->getUtilisateur() !== $this->getUser() || $commande->getStatut() !== 'En attente')) {
             throw $this->createAccessDeniedException('Vous n\'avez pas l\'autorisation de modifier cette commande.');
@@ -486,6 +485,18 @@ final class CommandeController extends AbstractController
 
             try {
                 $entityManager->flush();
+
+                $estLivree = ($commande->getStatut() === 'Livré');
+                $besoinRestitution = $commande->isPretMateriel();
+                $restitutionOk = $commande->isRestitutionMateriel();
+                
+                $estReellementFinie = $estLivree && (!$besoinRestitution || $restitutionOk);
+                $estAnnulee = (mb_strtolower(trim($commande->getStatut())) === 'annulé');
+
+                if ($estReellementFinie || $estAnnulee) {
+                    $statistiqueService->enregistrerVente($commande);
+                }
+
                 $this->addFlash('success', 'La commande a bien été mise à jour.');
                 
                 if ($this->isGranted('ROLE_EMPLOYE')) {
@@ -495,7 +506,7 @@ final class CommandeController extends AbstractController
                 return $this->redirectToRoute('app_utilisateur_profil', [], Response::HTTP_SEE_OTHER);
 
             } catch (\Exception $e) {
-                $this->addFlash('danger', 'Erreur SQL / Système : ' . $e->getMessage());
+                $this->addFlash('danger', 'Erreur lors de la mise à jour : ' . $e->getMessage());
             }
         }
 
@@ -507,26 +518,24 @@ final class CommandeController extends AbstractController
 
     #[Route('/{id}', name: 'app_commande_show', methods: ['GET'])]
     public function show(Commande $commande): Response
-    {
-        return $this->render('commande/show.html.twig', [
-            'commande' => $commande,
-        ]);
+{
+    $dataNoSQL = null;
+    try {
+        $mongoClient = new Client("mongodb://localhost:27017");
+        $collection = $mongoClient->vite_et_gourmand->ventes;
+        
+        $dataNoSQL = $collection->findOne(['numero_commande' => $commande->getNumeroCommande()]);
+    } catch (\Exception $e) {
     }
-
-    #[IsGranted('ROLE_EMPLOYE')]
-    #[Route('/{id}', name: 'app_commande_delete', methods: ['POST'])]
-    public function delete(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$commande->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($commande);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_commande_index', [], Response::HTTP_SEE_OTHER);
-    }
+   dump($dataNoSQL);
+    return $this->render('commande/show.html.twig', [
+        'commande' => $commande,
+        'dataNoSQL' => $dataNoSQL 
+    ]);
+}
 
     #[Route('/{id}/annuler-client', name: 'app_commande_annuler_client', methods: ['GET'])]
-    public function annulerClient(Commande $commande, EntityManagerInterface $entityManager): Response
+    public function annulerClient(Commande $commande, EntityManagerInterface $entityManager, StatistiqueService $statistiqueService): Response
     {
         if ($commande->getUtilisateur() !== $this->getUser() || $commande->getStatut() !== 'En attente') {
             $this->addFlash('danger', 'Vous ne pouvez pas annuler cette commande.');
@@ -543,6 +552,7 @@ final class CommandeController extends AbstractController
         }
 
         $entityManager->flush();
+        $statistiqueService->enregistrerVente($commande);
         $this->addFlash('success', 'Votre commande a été annulée avec succès et les stocks ont été mis à jour.');
 
         return $this->redirectToRoute('app_utilisateur_profil');

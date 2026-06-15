@@ -32,18 +32,37 @@
         <div class="card border-0 shadow-sm p-4 bg-white rounded h-100 d-flex flex-column">
             <h3 class="h5 mb-4 text-secondary border-bottom pb-2">1. Détail de la commande et tarification</h3>
             
-            {% for menu in commande.menus %}
+            {% for item in dataNoSQL.items %}
+                {% set totalLigne = item.total_ligne is defined ? item.total_ligne : (item.prix_menu_unitaire * item.quantite) %}
+                {% set prixSansRemise = item.prix_menu_unitaire * item.quantite %}
+                
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
                     <div class="flex-grow-1">
-                        <h4 class="h6 font-weight-bold text-dark mb-1">{{ menu.titre }}</h4>
-                        <small class="text-muted d-block mb-2">Tarif unitaire : {{ menu.prixParPersonne }} € / pers.</small>
+                        <h4 class="h6 font-weight-bold text-dark mb-1">{{ item.menu_nom }}</h4>
+                        <small class="text-muted d-block mb-1">Tarif : {{ item.prix_menu_unitaire }} € / pers.</small>
                         
                         <div class="d-flex align-items-center gap-2 mb-2">
-                            <span class="badge bg-light text-dark border px-3 py-1 font-weight-bold">Pour {{ commande.nombrePersonne }} pers.</span>
+                            <span class="badge bg-light text-dark border px-3 py-1 font-weight-bold">
+                                Pour {{ item.quantite }} pers.
+                            </span>
+                            
+                            {% if totalLigne < prixSansRemise %}
+                                <span class="badge bg-success" style="font-size: 0.7rem;">Remise appliquée</span>
+                            {% endif %}
                         </div>
                     </div>
+                    
                     <div class="text-end ms-3">
-                        <span class="d-block font-weight-bold text-dark h6 mb-1">{{ commande.prixMenu|number_format(2, ',', ' ') }} €</span>
+                        <span class="d-block font-weight-bold text-dark h6 mb-1">
+                            {{ totalLigne|number_format(2, ',', ' ') }} €
+                        </span>
+                        
+                        {% if totalLigne < prixSansRemise %}
+                            <small class="text-muted d-block" style="font-size: 0.8rem;">
+                                <del>{{ prixSansRemise|number_format(2, ',', ' ') }} €</del>
+                                <span class="text-success">(-{{ (prixSansRemise - totalLigne)|number_format(2, ',', ' ') }} €)</span>
+                            </small>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

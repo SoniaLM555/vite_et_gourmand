@@ -5,7 +5,6 @@
 {% block body %}
 
     <div class="card p-4 shadow-sm mb-4 bg-white border-0 rounded">
-        <h5 class="mb-3 text-secondary">Filtres d'analyse (SQL & MongoDB)</h5>
         <form method="get" class="row g-3">
             <div class="col-md-3">
                 <label for="date_debut" class="form-label small text-muted">Date de début</label>
@@ -16,8 +15,15 @@
                 <input type="date" id="date_fin" name="date_fin" class="form-control" value="{{ app.request.query.get('date_fin') }}">
             </div>
             <div class="col-md-4">
-                <label for="menu_filtre" class="form-label small text-muted">Filtrer par nom de Menu</label>
-                <input type="text" id="menu_filtre" name="menu_filtre" class="form-control" placeholder="Ex: Menu Gourmet" value="{{ app.request.query.get('menu_filtre') }}">
+                <label for="menu_filtre" class="form-label small text-muted">Filtrer par Menu</label>
+                <select id="menu_filtre" name="menu_filtre" class="form-select">
+                    <option value="">Tous les menus</option>
+                    {% for menu in tousLesMenus %}
+                        <option value="{{ menu.titre }}" {% if app.request.query.get('menu_filtre') == menu.titre %}selected{% endif %}>
+                            {{ menu.titre }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="col-md-2 align-self-end">
                 <button type="submit" class="btn btn-dark w-100">Appliquer</button>
@@ -28,16 +34,20 @@
     <div class="row mb-5">
         <div class="col-md-6 mb-4">
             <div class="card p-3 shadow-sm border-0 bg-white h-100">
-                <h5 class="text-center text-secondary mb-3">Chiffre d'Affaires par Menu (SQL SUM)</h5>
+                <h5 class="text-center text-secondary mb-3">Chiffre d'affaires</h5>
                 <canvas id="chartSQL" style="max-height: 260px;"></canvas>
             </div>
         </div>
         <div class="col-md-6 mb-4">
             <div class="card p-3 shadow-sm border-0 bg-white h-100">
-                <h5 class="text-center text-secondary mb-3">Volume de Commandes par Menu (NoSQL MongoDB)</h5>
+                <h5 class="text-center text-secondary mb-3">Volume de commandes par menu </h5>
                 <canvas id="chartNoSQL" style="max-height: 260px;"></canvas>
             </div>
         </div>
+    </div>
+
+    <div class="alert alert-success shadow-sm mb-4">
+        <strong>Chiffre d'affaires total historique :</strong> {{ caTotalNoSQL|number_format(2, ',', ' ') }} €
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -66,17 +76,13 @@
                         <td>{{ utilisateur.nom|upper }} {{ utilisateur.prenom }}</td>
                         <td>{{ utilisateur.ville|default('Non renseignée') }}</td>
                         <td>
-                            {% if utilisateur.roleObjet %}
-                                {% set libelle = utilisateur.roleObjet.libelle %}
-                                {% if libelle == 'Administrateur' %}
-                                    <span class="badge bg-danger small">Administrateur</span>
-                                {% elseif libelle == 'Employé' %}
-                                    <span class="badge bg-warning text-dark small">Employé</span>
-                                {% else %}
-                                    <span class="badge bg-secondary small">{{ libelle }}</span>
-                                {% endif %}
+                            {% set libelle = utilisateur.role_nom ?? 'Client' %}
+                            {% if libelle == 'Administrateur' %}
+                                <span class="badge bg-danger small">Administrateur</span>
+                            {% elseif libelle == 'Employé' %}
+                                <span class="badge bg-warning text-dark small">Employé</span>
                             {% else %}
-                                <span class="badge bg-secondary small">Client</span>
+                                <span class="badge bg-secondary small">{{ libelle }}</span>
                             {% endif %}
                         </td>
                         <td>
@@ -109,36 +115,52 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const labelsSQL = [{% for ca in totalChiffreAffaires|default([]) %}"{{ ca.menu_nom }}",{% endfor %}];
-        const dataSQL = [{% for ca in totalChiffreAffaires|default([]) %}{{ ca.chiffre_affaires }},{% endfor %}];
+        (function() {
+            const stats = {{ statsNoSQL|json_encode|raw }};
+            const caData = {{ caParMenuNoSQL|json_encode|raw }};
 
-        const labelsNoSQL = [{% for stat in statsNoSQL|default([]) %}"{{ stat.menu }}",{% endfor %}];
-        const dataNoSQL = [{% for stat in statsNoSQL|default([]) %}{{ stat.volume }},{% endfor %}];
+            if (stats.length > 0) {
+                const caMap = {};
+                caData.forEach(item => {
+                    caMap[item.menu] = item.ca;
+                });
 
-        new Chart(document.getElementById('chartSQL'), {
-            type: 'bar',
-            data: {
-                labels: labelsSQL.length ? labelsSQL : ["Aucun retour"],
-                datasets: [{
-                    label: "CA Global (€)",
-                    data: dataSQL.length ? dataSQL : [0],
-                    backgroundColor: '#4b5563',
-                    borderRadius: 4
-                }]
-            },
-            options: { responsive: true }
-        });
+                const labels = stats.map(s => s.menu);
+                const volumes = stats.map(s => s.volume);
+                const cas = labels.map(label => caMap[label] || 0);
 
-        new Chart(document.getElementById('chartNoSQL'), {
-            type: 'doughnut',
-            data: {
-                labels: labelsNoSQL.length ? labelsNoSQL : ["Aucun volume"],
-                datasets: [{
-                    data: dataNoSQL.length ? dataNoSQL : [1],
-                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#06b6d4']
-                }]
-            },
-            options: { responsive: true }
-        });
+                const chartSQL = Chart.getChart("chartSQL");
+                if (chartSQL) chartSQL.destroy();
+                
+                const chartNoSQL = Chart.getChart("chartNoSQL");
+                if (chartNoSQL) chartNoSQL.destroy();
+
+                new Chart(document.getElementById('chartSQL'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "CA par Menu (€)",
+                            data: cas,
+                            backgroundColor: '#4b5563'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                new Chart(document.getElementById('chartNoSQL'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Parts vendues",
+                            data: volumes,
+                            backgroundColor: '#10b981'
+                        }]
+                    },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+                });
+            }
+        })();
     </script>
 {% endblock %}

@@ -45,15 +45,16 @@ class RegistrationFormType extends AbstractType
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank(message: 'Veuillez saisir un mot de passe'), 
-                    new Length([ // <--- C'est ici que le crochet [ doit être immédiatement après la parenthèse (
-                        'min' => 8,
-                        'minMessage' => 'Votre mot de passe doit faire au moins {{ limit }} caractères',
-                        'max' => 4096,
-                    ]), // <--- Et ici la parenthèse ) doit être après le crochet ]
-                    new Regex([
-                        'pattern' => '/(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+/',
-                        'message' => 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.',
-                    ]),
+                    new Length(
+                        min: 8,
+                        max: 4096,
+                        minMessage: 'Votre mot de passe doit faire au moins {{ limit }} caractères',
+                        maxMessage: 'Votre mot de passe est trop long'
+                    ),
+                    new Regex(
+                        pattern: '/(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+/',
+                        message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.'
+                    ),
                 ],
             ])
         ;
