@@ -80,7 +80,8 @@ MAILER_DSN="null://default"
 **Import de la structure et des données** (incluant les comptes de démonstration et le compte administrateur) :
 
 ```bash
-mysql -u root -p vite_gourmand < database.sql
+mysql -u root -p vite_et_gourmand < annexes_sql/1_structure.sql
+mysql -u root -p vite_et_gourmand < annexes_sql/2_jeu_d_essai.sql
 ```
 
 > **Note :** assurez-vous que le binaire `mysql` est accessible dans votre terminal. Avec Laragon, utilisez le menu *Terminal* > *MySQL*, ou ajoutez le chemin du binaire à votre PATH.
@@ -93,7 +94,7 @@ php bin/console doctrine:migrations:migrate
 
 > **MongoDB :** aucune création préalable n'est nécessaire. La base et la collection de statistiques sont créées automatiquement lors de la première synchronisation des données.
 
-> **Comptes de connexion :** les identifiants (utilisateur, employé, administrateur) sont disponibles dans le manuel d'utilisation fourni au format PDF.
+> **Comptes de connexion :** contacter l'auteur du projet pour obtenir les identifiants de démonstration.
 
 ### 5. Lancement de l'application
 
