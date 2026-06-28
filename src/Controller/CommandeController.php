@@ -517,21 +517,15 @@ final class CommandeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_commande_show', methods: ['GET'])]
-    public function show(Commande $commande): Response
-{
-    $dataNoSQL = null;
-    try {
-        $mongoClient = new Client("mongodb://localhost:27017");
-        $collection = $mongoClient->vite_et_gourmand->ventes;
-        
-        $dataNoSQL = $collection->findOne(['numero_commande' => $commande->getNumeroCommande()]);
-    } catch (\Exception $e) {
+    public function show(Commande $commande, StatistiqueService $statistiqueService): Response
+    {
+        $dataNoSQL = $statistiqueService->findVente($commande->getNumeroCommande());
+
+        return $this->render('commande/show.html.twig', [
+            'commande' => $commande,
+            'dataNoSQL' => $dataNoSQL,
+        ]);
     }
-    return $this->render('commande/show.html.twig', [
-        'commande' => $commande,
-        'dataNoSQL' => $dataNoSQL 
-    ]);
-}
 
     #[Route('/{id}/annuler-client', name: 'app_commande_annuler_client', methods: ['GET'])]
     public function annulerClient(Commande $commande, EntityManagerInterface $entityManager, StatistiqueService $statistiqueService): Response

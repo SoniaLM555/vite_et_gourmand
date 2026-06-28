@@ -57,7 +57,6 @@
                         <div class="d-flex gap-2">
                             <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
                             
-                            {# Remplacement du formulaire de suppression par le bouton désactiver #}
                             <form method="post" action="{{ path('app_utilisateur_toggle', {'id': utilisateur.id}) }}" onsubmit="return confirm('Confirmer le changement de statut ?');">
                                 <button class="btn btn-sm btn-outline-danger">
                                     {{ utilisateur.isVerified ? 'Désactiver' : 'Réactiver' }}
@@ -72,7 +71,7 @@
     {% else %}
         
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Mon espace personnel (Staff)</h1>
+            <h1>Mon espace personnel</h1>
             <a href="{{ path('app_menu_index') }}" class="btn btn-outline-dark">Retour aux menus</a>
         </div>
 

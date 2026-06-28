@@ -42,7 +42,6 @@
                 <div class="col-md-4">
                     <p class=" fw-bold mb-3" style="color: var(--color-dark);">{{ nom }}</p>
                     <p class=" mb-1">{{ plat.nom ?? 'Non défini' }}</p>
-                    {# Allergènes non centrés #}
                     <p class="small text-muted">Allergènes: {% for a in plat.allergenes %}{{ a.nom }}{% if not loop.last %}, {% endif %}{% else %}Aucun{% endfor %}</p>
                 </div>
             {% endfor %}
