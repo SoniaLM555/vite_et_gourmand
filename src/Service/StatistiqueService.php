@@ -7,12 +7,14 @@ use MongoDB\Client;
 
 class StatistiqueService
 {
-    private $collection;
+
+    private string $mongodbUri;
+    private string $mongodbDb;
 
     public function __construct(string $mongodbUri, string $mongodbDb)
     {
-        $client = new Client($mongodbUri);
-        $this->collection = $client->selectDatabase($mongodbDb)->selectCollection('ventes');
+        $this->mongodbUri = $mongodbUri;
+        $this->mongodbDb = $mongodbDb;
     }
 
     public function enregistrerVente(Commande $commande)
@@ -52,6 +54,22 @@ class StatistiqueService
             'items' => $items
         ];
 
-        $this->collection->insertOne($document);
+        try {
+            $client = new Client($this->mongodbUri);
+            $collection = $client->selectDatabase($this->mongodbDb)->selectCollection('ventes');
+            $collection->insertOne($document);
+        } catch (\Exception $e) {
+        }
+    }
+
+    public function findVente(string $numeroCommande): ?array
+    {
+        try {
+            $client = new Client($this->mongodbUri);
+            $collection = $client->selectDatabase($this->mongodbDb)->selectCollection('ventes');
+            return $collection->findOne(['numero_commande' => $numeroCommande]);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }
