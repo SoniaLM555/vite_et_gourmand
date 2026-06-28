@@ -3,11 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Role;
-use App\Form\RoleType;
 use App\Repository\RoleRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -26,23 +23,9 @@ final class RoleController extends AbstractController
     }
 
     #[Route('/new', name: 'app_role_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(): Response
     {
-        $role = new Role();
-        $form = $this->createForm(RoleType::class, $role);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($role);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_role_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('role/new.html.twig', [
-            'role' => $role,
-            'form' => $form,
-        ]);
+        throw $this->createAccessDeniedException('Les rôles sont figés et ne peuvent pas être modifiés.');
     }
 
     #[Route('/{id}', name: 'app_role_show', methods: ['GET'])]
@@ -54,31 +37,14 @@ final class RoleController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_role_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Role $role, EntityManagerInterface $entityManager): Response
+    public function edit(Role $role): Response
     {
-        $form = $this->createForm(RoleType::class, $role);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_role_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('role/edit.html.twig', [
-            'role' => $role,
-            'form' => $form,
-        ]);
+        throw $this->createAccessDeniedException('Les rôles sont figés et ne peuvent pas être modifiés.');
     }
 
     #[Route('/{id}', name: 'app_role_delete', methods: ['POST'])]
-    public function delete(Request $request, Role $role, EntityManagerInterface $entityManager): Response
+    public function delete(Role $role): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$role->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($role);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_role_index', [], Response::HTTP_SEE_OTHER);
+        throw $this->createAccessDeniedException('Les rôles sont figés et ne peuvent pas être modifiés.');
     }
 }

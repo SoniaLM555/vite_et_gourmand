@@ -58,8 +58,9 @@ final class UtilisateurController extends AbstractController
                 $utilisateur->setIsVerified(true);
             }
 
-            if ($utilisateur->getPassword()) {
-                $hashedPassword = $passwordHasher->hashPassword($utilisateur, $utilisateur->getPassword());
+            $plainPassword = $form->get('password')->getData();
+            if ($plainPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($utilisateur, $plainPassword);
                 $utilisateur->setPassword($hashedPassword);
             }
 
