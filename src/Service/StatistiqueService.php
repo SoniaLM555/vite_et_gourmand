@@ -9,10 +9,10 @@ class StatistiqueService
 {
     private $collection;
 
-    public function __construct()
+    public function __construct(string $mongodbUri, string $mongodbDb)
     {
-        $client = new Client("mongodb://localhost:27017");
-        $this->collection = $client->selectDatabase('vite_et_gourmand')->selectCollection('ventes');
+        $client = new Client($mongodbUri);
+        $this->collection = $client->selectDatabase($mongodbDb)->selectCollection('ventes');
     }
 
     public function enregistrerVente(Commande $commande)
