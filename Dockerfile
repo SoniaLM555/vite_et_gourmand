@@ -68,7 +68,7 @@ FROM php:8.4-apache as final
 #    && pecl install xdebug-3.2.1 \
 #    && docker-php-ext-enable redis xdebug
 
-RUN apt-get update && apt-get install -y libicu-dev libonig-dev libxml2-dev libssl-dev && \
+RUN apt-get update && apt-get install -y libicu-dev libonig-dev libxml2-dev libssl-dev ca-certificates && \
     docker-php-ext-install pdo pdo_mysql intl mbstring xml && \
     pecl install mongodb && \
     docker-php-ext-enable mongodb && \
