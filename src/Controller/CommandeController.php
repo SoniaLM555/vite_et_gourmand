@@ -527,7 +527,6 @@ final class CommandeController extends AbstractController
         $dataNoSQL = $collection->findOne(['numero_commande' => $commande->getNumeroCommande()]);
     } catch (\Exception $e) {
     }
-   dump($dataNoSQL);
     return $this->render('commande/show.html.twig', [
         'commande' => $commande,
         'dataNoSQL' => $dataNoSQL 
