@@ -40,7 +40,7 @@ Application web permettant la présentation et la commande de menus de prestatio
 
 - **MongoDB** (Community Server)
   Téléchargement : https://www.mongodb.com/try/download/community
-  L'extension PHP `mongodb` doit être activée dans `php.ini`
+  L'extension PHP `mongodb` doit être activée dans `php.ini`: télécharger `php_mongodb.dll` sur https://pecl.php.net/package/mongodb, la placer dans le dossier `ext/` de PHP, puis ajouter `extension=mongodb` dans `php.ini`.
 
 ---
 
