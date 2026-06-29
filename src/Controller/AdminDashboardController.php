@@ -33,19 +33,24 @@ class AdminDashboardController extends AbstractController
 
         $totalChiffreAffaires = $qb->executeQuery()->fetchAllAssociative();
 
-        $utilisateurs = $connection->createQueryBuilder()
+        $qbUsers = $connection->createQueryBuilder()
             ->select('u.id', 'u.email', 'u.nom', 'u.prenom', 'u.ville', 'u.is_verified AS isVerified', 'r.libelle AS role_nom', 'u.roles')
             ->from('utilisateur', 'u')
-            ->innerJoin('u', 'role', 'r', 'u.role_objet_id = r.id')
-            ->executeQuery()
-            ->fetchAllAssociative();
+            ->innerJoin('u', 'role', 'r', 'u.role_objet_id = r.id');
+           
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $qbUsers->andWhere("r.libelle = 'Client'");
+        }
+
+        $utilisateurs = $qbUsers->executeQuery()->fetchAllAssociative();
+
         foreach ($utilisateurs as &$u) { $u['roles'] = json_decode($u['roles'] ?? '[]', true); $u['isActive'] = true; }
 
         $tousLesMenus = $connection->createQueryBuilder()->select('titre')->from('menu')->orderBy('titre', 'ASC')->executeQuery()->fetchAllAssociative();
 
         $caTotalNoSQL = 0; $statsNoSQL = []; $caParMenuNoSQL = [];
         try {
-            $mongoClient = new Client($_ENV['MONGODB_URL']);
+            $mongoClient = new Client($_ENV['MONGODB_URI']);
             $collection = $mongoClient->selectDatabase($_ENV['MONGODB_DB'])->selectCollection('ventes');
 
             $match = [];
