@@ -65,11 +65,11 @@ Créer un fichier `.env.local` à la racine du projet à partir du fichier `.env
 
 ```bash
 # Configuration MySQL
-DATABASE_URL="mysql://root:@127.0.0.1:3306/vite_gourmand?serverVersion=8.0&charset=utf8mb4"
+DATABASE_URL="mysql://root:@127.0.0.1:3306/vite_et_gourmand?serverVersion=8.0&charset=utf8mb4"
 
 # Configuration MongoDB
-MONGODB_URL="mongodb://127.0.0.1:27017"
-MONGODB_DB="vite_gourmand_stats"
+MONGODB_URI="mongodb://127.0.0.1:27017"
+MONGODB_DB="vite_et_gourmand"
 
 # Configuration Mailer (utiliser 'null://default' pour le développement)
 MAILER_DSN="null://default"

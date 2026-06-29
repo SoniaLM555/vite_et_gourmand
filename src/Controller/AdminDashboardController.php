@@ -45,8 +45,8 @@ class AdminDashboardController extends AbstractController
 
         $caTotalNoSQL = 0; $statsNoSQL = []; $caParMenuNoSQL = [];
         try {
-            $mongoClient = new Client("mongodb://localhost:27017");
-            $collection = $mongoClient->vite_et_gourmand->ventes;
+            $mongoClient = new Client($_ENV['MONGODB_URL']);
+            $collection = $mongoClient->selectDatabase($_ENV['MONGODB_DB'])->selectCollection('ventes');
 
             $match = [];
             if ($menuFiltre) {
