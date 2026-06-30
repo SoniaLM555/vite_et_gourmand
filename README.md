@@ -1,8 +1,9 @@
 # Vite & Gourmand - Application Web
 
 Application web permettant la présentation et la commande de menus de prestation traiteur pour l'entreprise Vite & Gourmand.
+**Application en ligne :** https://vite-et-gourmand-wandering-tide-4117.fly.dev/
 
-*Ce projet a été développé et testé sur Windows (PHP 8.4, Laragon). Les instructions d'installation ci-dessous sont adaptées à cet environnement.*
+*Ce projet a été développé et testé sur Windows (PHP 8.5, Laragon). Les instructions d'installation ci-dessous sont adaptées à cet environnement.*
 
 ---
 
@@ -17,6 +18,8 @@ Application web permettant la présentation et la commande de menus de prestatio
   - [5. Lancement de l'application](#5-lancement-de-lapplication)
 - [Choix techniques](#choix-techniques)
   - [Architecture hybride MySQL / MongoDB](#architecture-hybride-mysql--mongodb)
+  - [APIs externes](#apis-externes)
+  - [Envoi d'e-mails](#envoi-de-mails)
   - [Sécurisation](#sécurisation)
 
 ---
@@ -40,7 +43,7 @@ Application web permettant la présentation et la commande de menus de prestatio
   Via Laragon, WAMP, ou installation autonome
   Laragon : https://laragon.org/download/
 
-- **MongoDB** (Community Server)
+- **MongoDB** (Community Server - version gratuite et open source )
   Téléchargement : https://www.mongodb.com/try/download/community
   L'extension PHP `mongodb` doit être activée dans `php.ini`: télécharger `php_mongodb.dll` sur https://pecl.php.net/package/mongodb, la placer dans le dossier `ext/` de PHP, puis ajouter `extension=mongodb` dans `php.ini`.
 
@@ -86,7 +89,7 @@ mysql -u root -p vite_et_gourmand < annexes_sql/1_structure.sql
 mysql -u root -p vite_et_gourmand < annexes_sql/2_jeu_d_essai.sql
 ```
 
-> **Note :** assurez-vous que le binaire `mysql` est accessible dans votre terminal. Avec Laragon, utilisez le menu *Terminal* > *MySQL*, ou ajoutez le chemin du binaire à votre PATH.
+> **Note :** Si la commande `mysql` n'est pas reconnue dans votre terminal, ouvrez le terminal intégré de Laragon via le menu *Terminal* > *MySQL* et relancez la commande depuis là.
 
 **Application des migrations Doctrine** :
 
@@ -114,9 +117,20 @@ L'application est accessible à l'adresse indiquée par la commande (par défaut
 
 La base de données relationnelle **MySQL** est utilisée pour l'ensemble des données transactionnelles de l'application : utilisateurs, menus, plats, commandes, avis. Ces données nécessitent des garanties **ACID** (atomicité, cohérence, isolation, durabilité), indispensables pour gérer correctement les commandes, les statuts et les relations entre entités (utilisateur, menu, plat, allergène, etc.).
 
-**MongoDB** est utilisé pour les besoins analytiques de l'espace administrateur, notamment le calcul et l'agrégation du nombre de commandes par menu et du chiffre d'affaires associé. Ce type de données, orienté lecture massive et agrégations statistiques, s'adapte mieux à un modèle documentaire flexible, sans contrainte de schéma rigide, et permet de découpler les traitements analytiques du système transactionnel principal.
+**MongoDB** est utilisé pour les besoins analytiques de l'espace administrateur, notamment le calcul et l'agrégation du nombre de commandes par menu et du chiffre d'affaires associé. MongoDB est mieux adapté pour lire et calculer de grandes quantités de données statistiques. Contrairement à MySQL qui impose une structure fixe (les mêmes colonnes pour chaque ligne), MongoDB est flexible , c'est à dire que chaque document peut avoir sa propre structure. Et surtout, en séparant les statistiques dans MongoDB, on évite de surcharger MySQL avec des calculs lourds qui pourraient ralentir les commandes des clients.
 
 La synchronisation des données vers MongoDB est déclenchée lors de chaque changement de statut d'une commande à "livré" ou "annulé", afin que les statistiques affichées dans l'espace administrateur restent à jour sans solliciter directement la base transactionnelle pour des requêtes d'agrégation coûteuses.
+
+### APIs externes
+
+- **API Nationale des Adresses** : géolocalisation de l'adresse de livraison saisie par le client
+- **API IGN** : calcul de la distance routière réelle pour les frais de livraison
+
+Ces appels sont effectués côté serveur, les calculs ne peuvent pas être falsifiés côté client.
+
+### Envoi d'e-mails
+
+En développement, `MAILER_DSN=null://default` désactive l'envoi réel des e-mails, visualisés via le **Web Profiler Symfony**. En production, remplacer par un service SMTP sans modifier le code.
 
 ### Sécurisation
 
