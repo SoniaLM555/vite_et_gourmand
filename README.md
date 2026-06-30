@@ -2,6 +2,8 @@
 
 Application web permettant la présentation et la commande de menus de prestation traiteur pour l'entreprise Vite & Gourmand.
 
+*Ce projet a été développé et testé sur Windows (PHP 8.4, Laragon). Les instructions d'installation ci-dessous sont adaptées à cet environnement.*
+
 ---
 
 ## Table des matières
